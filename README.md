@@ -44,7 +44,7 @@
       (이때 간단히 찾는 방법은 위의 "type filter text" 항목에 JPA라고 입력)
     4. 이렇게 설치과정을 진행 후 이클립스 재구동
 
-## 📌 Lombok 설치
-    1. Lombok 다운로드(https://projectlombok.org/download)
+## 📌 [Lombok 설치](https://projectlombok.org/download)
+    1. Lombok 사이트 방문 후 다운로드
     2. STS 경로에 설치 후 재시작
     3. Refresh gradle project
