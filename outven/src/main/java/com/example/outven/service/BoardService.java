@@ -1,234 +1,142 @@
 package com.example.outven.service;
 
-import java.util.List;
-
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import com.example.outven.dao.BoardCommentDAO;
-import com.example.outven.dao.BoardDAO;
-import com.example.outven.dao.BoardreportDAO;
-import com.example.outven.dao.RecommendDAO;
 import com.example.outven.dto.BoardDTO;
 import com.example.outven.entity.Board;
 import com.example.outven.entity.Board_comment;
-import com.example.outven.entity.Boardreport;
-import com.example.outven.entity.Recommend;
+import com.example.outven.repository.BoardRepository;
+import com.example.outven.repository.BoardCommentRepository;
 
 @Service
 public class BoardService {
 
-	@Autowired
-	private BoardDAO dao;
+    @Autowired
+    private BoardRepository boardRepository;
 
-	// 24/02/23 추가
-	@Autowired
-	private RecommendDAO recom_dao;
+    @Autowired
+    private BoardCommentRepository boardCommentRepository;
 
-	// 24/02/23 추가
-	@Autowired
-	private BoardreportDAO report_dao;
+    // ✅ BoardDTO → Board 변환 메서드
+    private Board convertToEntity(BoardDTO dto) {
+        Board board = new Board();
+        BeanUtils.copyProperties(dto, board); // DTO 필드 → Entity 필드 매핑
+        return board;
+    }
 
-	// 24/02/27 추가
-	@Autowired
-	private BoardCommentDAO comment_dao;
+    // ✅ 게시글 작성 (BoardDTO → Entity 변환 후 저장)
+    public boolean createBoard(BoardDTO dto) {
+        try {
+            Board board = convertToEntity(dto);
+            boardRepository.save(board);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
-	// 목록보기
-	public List<Board> boardList(int startnum, int endnum) {
-		return dao.boardList(startnum, endnum);
-	}
+    // ✅ 게시글 수정 (기존 게시글 정보 덮어쓰기)
+    public boolean updateBoard(BoardDTO dto) {
+        try {
+            Board board = convertToEntity(dto);
+            boardRepository.save(board);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
-	// 카테고리 목록보기
-	public List<Board> boardCategoryList(String board_category, int startnum, int endnum) {
-		return dao.boardCategoryList(board_category, startnum, endnum);
-	}
-	
-	// 추천게시판 목록보기
-	public List<Board> recommendBoardCategoryList(int startnum, int endnum) {
-		return dao.recommendBoardCategoryList(startnum, endnum);
-	}
-	
-	// 추천게시판 갯수
-	public int getRecommendBoardCount() {
-		return (int) dao.getRecommendBoardCount();
-	}
-	
-	// 디테일 목록보기
-	public List<Board> boardDetailList(String board_category, String detail_category, int startnum, int endnum) {
-		return dao.boardDetailList(board_category, detail_category, startnum, endnum);
-	}
+    // ✅ 카테고리별 게시글 목록 조회 (페이징 적용)
+    public Page<Board> getBoardListByCategory(String boardCategory, Pageable pageable) {
+        return boardRepository.findByBoardCategory(boardCategory, pageable);
+    }
 
-	// 총데이터 갯수
-	public int getCount() {
-		return (int) dao.getCount();
-	}
+    // ✅ 특정 게시글 상세 조회 (board_num 기준)
+    public Board boardView(int boardNum) {
+        return boardRepository.findById(boardNum)
+                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다: " + boardNum));
+    }
 
-	// 보드카테고리 목록갯수
-	public int getBoardCount(String board_category) {
-		return dao.getBoardCount(board_category);
-	}
+    // ✅ 댓글 목록 조회 (게시글 번호 기준 페이징 적용)
+    public Page<Board_comment> getCommentList(int boardNum, Pageable pageable) {
+        return boardCommentRepository.findByBoardNum(boardNum, pageable);
+    }
 
-	// 디테일 목록갯수
-	public int getDetailCount(String board_category, String detail_category) {
-		return dao.getDetailCount(board_category, detail_category);
-	}
+    // ✅ 게시글 엔티티 직접 저장 (수정 포함)
+    public void saveBoard(Board board) {
+        boardRepository.save(board);
+    }
 
-	// 글저장하기 : insert
-	public boolean insert(BoardDTO dto) {
-		return dao.insert(dto);
-	}
+    // ✅ 특정 카테고리의 전체 게시글 수 반환
+    public long getBoardCount(String boardCategory) {
+        return boardRepository.countByBoardCategory(boardCategory);
+    }
 
-	// 상세보기
-	public Board boardView(int board_num) {
-		return dao.boardView(board_num);
-	}
+    // ✅ 카테고리 + 상세카테고리 기준 게시글 수 반환
+    public long getDetailCount(String boardCategory, String detailCategory) {
+        return boardRepository.countByBoardCategoryAndDetailCategory(boardCategory, detailCategory);
+    }
 
-	// 조회수 증가
-	public Board updateHit(int board_num) {
-		return dao.updateHit(board_num);
-	}
+    // ✅ 카테고리 + 상세카테고리 기준 게시글 목록 조회
+    public Page<Board> getBoardsByCategoryAndDetail(String boardCategory, String detailCategory, Pageable pageable) {
+        return boardRepository.findByBoardCategoryAndDetailCategory(boardCategory, detailCategory, pageable);
+    }
 
-	// 데이터 삭제
-	public boolean boardDelete(int board_num) {
-		return dao.boardDelete(board_num);
-	}
+    // ✅ 게시글 삭제 (board_num 기준)
+    public boolean deleteBoard(int boardNum) {
+        try {
+            boardRepository.deleteById(boardNum);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
-	// 데이터 수정
-	public boolean boardModify(BoardDTO dto) {
-		return dao.boardModify(dto);
-	}
+    // ✅ 조회수 증가 처리
+    public void updateHit(int boardNum) {
+        boardRepository.updateHit(boardNum);
+    }
 
-//////////////////////////////////////////////////////
-	// 메인 검색 [제목]
-	public List<Board> searchByBoard_titleAndStartAndEndnum(String keyword, int startnum, int endnum) {
-		keyword = "%" + keyword + "%";
-		return dao.searchByBoard_titleAndStartAndEndnum(keyword, startnum, endnum);
-	}
+    // ✅ 추천수 기준으로 게시글 조회 (추천수 ≥ threshold)
+    public Page<Board> getBoardsByRecommendGreaterThanEqual(int threshold, Pageable pageable) {
+        return boardRepository.findByRecommendGreaterThanEqual(threshold, pageable);
+    }
 
-	// 게시판 내 검색기능: 글제목
-	public List<Board> searchByBoard_titleAndStartnumAndEndnumAndBoardCategory(String keyword, int startnum, int endnum,
-			String board_category) {
-		keyword = "%" + keyword + "%";
-		return dao.searchByBoard_titleAndStartnumAndEndnumAndBoardCategory(keyword, startnum, endnum, board_category);
-	}
+    // ✅ 메인화면용 추천 게시글 조회 (alias)
+    public Page<Board> getRecommendedBoards(int recommendThreshold, Pageable pageable) {
+        return getBoardsByRecommendGreaterThanEqual(recommendThreshold, pageable);
+    }
 
-	// 게시판 내 검색기능: 글내용
-	public List<Board> searchByBoard_contentAndStartnumAndEndnumAndBoardCategory(String keyword, int startnum,
-			int endnum, String board_category) {
-		keyword = "%" + keyword + "%";
-		return dao.searchByBoard_contentAndStartnumAndEndnumAndBoardCategory(keyword, startnum, endnum, board_category);
-	}
+    // 🔍 제목 검색 (카테고리 조건 포함)
+    public Page<Board> searchByTitleAndCategory(String keyword, String category, Pageable pageable) {
+        return boardRepository.findByTitleContainingAndBoardCategory(keyword, category, pageable);
+    }
 
-	// 게시판 내 검색기능: 닉네임
-	public List<Board> searchByNick_nameAndStartnumAndEndnumAndBoardCategory(String keyword, int startnum, int endnum,
-			String board_category) {
-		keyword = "%" + keyword + "%";
-		return dao.searchByNick_nameAndStartnumAndEndnumAndBoardCategory(keyword, startnum, endnum, board_category);
-	}
+    // 🔍 내용 검색 (카테고리 조건 포함)
+    public Page<Board> searchByContentAndCategory(String keyword, String category, Pageable pageable) {
+        return boardRepository.findByContentContainingAndBoardCategory(keyword, category, pageable);
+    }
 
-	// 게시판 내 검색기능: 글작성자(회원Id)
-	public List<Board> searchByMember_idAndStartnumAndEndnumAndBoardCategory(String keyword, int startnum, int endnum,
-			String board_category) {
-		keyword = "%" + keyword + "%";
-		return dao.searchByMember_idAndStartnumAndEndnumAndBoardCategory(keyword, startnum, endnum, board_category);
-	}
+    // 🔍 닉네임 검색 (카테고리 조건 포함)
+    public Page<Board> searchByNickNameAndCategory(String keyword, String category, Pageable pageable) {
+        return boardRepository.findByNickNameContainingAndBoardCategory(keyword, category, pageable);
+    }
 
-	// 게시판 내 검색기능: 글제목 + 글내용
-	public List<Board> searchByKeywordAndStartnumAndEndnumAndBoardCategory(String keyword, int startnum, int endnum,
-			String board_category) {
-		return dao.searchByKeywordAndStartnumAndEndnumAndBoardCategory(keyword, startnum, endnum, board_category);
-	}
+    // 🔍 작성자 ID 검색 (카테고리 조건 포함)
+    public Page<Board> searchByMemberIdAndCategory(String keyword, String category, Pageable pageable) {
+        return boardRepository.findByMemberIdContainingAndBoardCategory(keyword, category, pageable);
+    }
 
-///////////////////////////////////////////////////
-//검색어: 제목수
-	public int getTitleCount(String keyword) {
-		return dao.getTitleCount(keyword);
-	}
-
-//검색어: 내용수
-	public int getContentCount(String keyword) {
-		return dao.getContentCount(keyword);
-	}
-
-//검색어: 닉네임 수
-	public int getNickNameCount(String keyword) {
-		return dao.getNickNameCount(keyword);
-	}
-
-//검색어: 멤버수
-	public int getMemberIdCount(String keyword) {
-		return dao.getMemberIdCount(keyword);
-	}
-
-	// 검색어: 제목 + 내용(키워드수)
-	public int getKeywordCount(String keyword) {
-		return dao.getKeywordCount(keyword);
-	}
-
-	// 24/02/23 추가
-	// 추천 테이블 삽입
-	public boolean insertRecomment(Recommend recommend) {
-		return recom_dao.insertRecomment(recommend);
-	}
-
-	// 24/02/23 추가
-	// 추천 값 변경 함수
-	public boolean updateRecommned(int board_num) {
-		return dao.updateRecommned(board_num);
-	}
-
-	// 24/02/23 추가
-	// 추천 주었는지 확인
-	public boolean recomCheck(int board_num, String member_id) {
-		return recom_dao.recomCheck(board_num, member_id);
-	}
-
-	// 24/02/23 추가
-	// 신고 입력하기
-	public boolean reportWrite(Boardreport boardreport) {
-		return report_dao.reportWrite(boardreport);
-	}
-
-	// 24/02/23 추가
-	// 신고 값 변경 함수
-	public boolean updateReport(int board_num) {
-		return dao.updateReport(board_num);
-	}
-
-	// 24/02/23 추가
-	// 중복값 있는지 검사
-	public boolean reportCheck(int board_num, String member_id) {
-		return report_dao.reportCheck(board_num, member_id);
-	}
-
-	// 24/02/27 추가
-	// 댓글 리스트 : 게시판 번호와 일치한 댓글 10개 조회
-	public List<Board_comment> boardCommentList(int startnum, int endnum, int board_num) {
-		return comment_dao.boardCommentList(startnum, endnum, board_num);
-	}
-
-	// 24/02/27 추가
-	// 게시판 번호와 일치한 데이터 수를 구함
-	public int getCount(int board_num) {
-		return comment_dao.getCount(board_num);
-	}
-
-	// 24/02/27 추가
-	// 댓글 입력
-	public boolean commentWrite(Board_comment comment) {
-		return comment_dao.commentWrite(comment);
-	}
-
-	// 24/02/27 추가
-	// 답글
-	public boolean recomment(Board_comment comment) {
-		return comment_dao.recomment(comment);
-	}
-
-	// 24/02/27 추가
-	// 댓글 삭제 처리
-	public boolean commentDelete(int comment_num) {
-		return comment_dao.commentDelete(comment_num);
-	}
-
+    // 🔍 제목 또는 내용 검색 (카테고리 조건 포함)
+    public Page<Board> searchByTitleOrContentAndCategory(String title, String content, String category, Pageable pageable) {
+        return boardRepository.findByTitleContainingOrContentContainingAndBoardCategory(title, content, category, pageable);
+    }
+    
+    // ✅ 제목 기준 통합 검색 (전체 게시판 대상)
+    public Page<Board> searchByTitle(String keyword, Pageable pageable) {
+        return boardRepository.findByTitleContaining(keyword, pageable);
+    }
 }

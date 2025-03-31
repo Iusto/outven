@@ -3,27 +3,27 @@ package com.example.outven.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
 import com.example.outven.entity.Champskinrate;
 
+import java.util.Optional;
+
 public interface ChampSkinRateRepository extends JpaRepository<Champskinrate, Integer> {
-	// 특정 챔피언 점수의 합
-	@Query(value = "select sum(rate) from Champskinrate where champ_code = :champ_code and skin_code = :skin_code",
-					nativeQuery = true)
-	int sumRateByChampCode(@Param("champ_code")int champ_code,
-							@Param("skin_code")int skin_code);
-	
-	// 특정 챔피언의 수
-	@Query(value = "select count(*) from Champskinrate where champ_code = :champ_code and skin_code = :skin_code",
-					nativeQuery = true)
-	int countRateByChampCode(@Param("champ_code")int champ_code,
-							@Param("skin_code")int skin_code);
-	
-	// 평점 주었는지 유무 확인(조회되면 중복됨)
-	@Query(value = "select * from Champskinrate where champ_code = :champ_code and skin_code = :skin_code and member_id = :member_id",
-				nativeQuery = true)
-	Champskinrate findByChampcodeAndSkincodeAndMemberid(
-			@Param("champ_code")int champ_code,
-			@Param("skin_code")int skin_code,
-			@Param("member_id")String member_id);
+
+    // ✅ 특정 챔피언 스킨의 평점 총합
+    @Query("SELECT SUM(c.rate) FROM Champskinrate c WHERE c.champ_code = :champCode AND c.skin_code = :skinCode")
+    Optional<Integer> sumRateByChampCodeAndSkinCode(@Param("champCode") int champCode,
+                                                    @Param("skinCode") int skinCode);
+
+    // ✅ 특정 챔피언 스킨의 평점 개수
+    long countByChampCodeAndSkinCode(int champCode, int skinCode);
+
+    // ✅ 특정 챔피언 스킨에 대해 특정 유저가 평점을 남겼는지 확인
+    Optional<Champskinrate> findByChampCodeAndSkinCodeAndMemberId(int champCode, int skinCode, String memberId);
+
+    // ✅ 챔피언 스킨의 평균 평점 구하기
+    @Query("SELECT AVG(c.rate) FROM Champskinrate c WHERE c.champ_code = :champCode AND c.skin_code = :skinCode")
+    Optional<Double> getAverageRate(@Param("champCode") int champCode, @Param("skinCode") int skinCode);
+
+    // ✅ 특정 유저가 특정 스킨에 평점을 남겼는지 확인
+    boolean existsByChampCodeAndSkinCodeAndMemberId(int champCode, int skinCode, String memberId);
 }

@@ -20,6 +20,7 @@ import lombok.ToString;
 @AllArgsConstructor
 public class Member {
 	@Id
+	@Column(name = "member_id")
     private String member_id;    	// 아이디(고유값)
     private String membername;    	// 이름
     private String nick_name; 		// 별명
@@ -34,6 +35,10 @@ public class Member {
     private Date logtime;  			// 마지막 로그인 날짜
     @Temporal(TemporalType.DATE)
     private Date jointime;  		// 회원가입날짜
+    @Column(name = "member_level")
     private int member_level;       // 레벨
-    private int member_exp;         // 경험치 바
+    @Column(name = "member_exp")
+    private String memberExp;  		// 경험치
+    @Column(name = "role")
+    private String role;			// 역할
 }

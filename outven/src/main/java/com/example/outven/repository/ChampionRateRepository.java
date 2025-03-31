@@ -1,5 +1,7 @@
 package com.example.outven.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -7,19 +9,19 @@ import org.springframework.data.repository.query.Param;
 import com.example.outven.entity.Championrate;
 
 public interface ChampionRateRepository extends JpaRepository<Championrate, Integer> {
-	// 특정 챔피언 점수의 합
-	@Query(value = "select sum(rate) from championRate where champ_code = :champ_code",
-					nativeQuery = true)
-	int sumRateByChampCode(@Param("champ_code")int champ_code);
-	
-	// 특정 챔피언의 수
-	@Query(value = "select count(*) from championRate where champ_code = :champ_code",
-					nativeQuery = true)
-	int countRateByChampCode(@Param("champ_code")int champ_code);
-	
-	// 평점 주웠는지 유무 확인(조회가 되면 중복됨)
-	@Query(value = "select * from championRate where champ_code = :champ_code and member_id = :member_id",
-						nativeQuery = true)
-	Championrate findByChampcodeAndMemberid(@Param("champ_code")int champ_code,
-											@Param("member_id")String member_id);
+
+    // 특정 챔피언의 평점 총합
+    @Query(value = "SELECT SUM(rate) FROM championRate WHERE champ_code = :champCode", nativeQuery = true)
+    int sumRateByChampCode(@Param("champCode") int champCode);
+
+    // 특정 챔피언의 평점 개수
+    @Query(value = "SELECT COUNT(*) FROM championRate WHERE champ_code = :champCode", nativeQuery = true)
+    int countRateByChampCode(@Param("champCode") int champCode);
+
+    // 챔피언에 대한 특정 사용자의 평점 여부 확인
+    boolean existsByChamp_codeAndMember_id(int champCode, String memberId);
+
+    // 챔피언의 평균 평점 계산
+    @Query("SELECT AVG(c.rate) FROM Championrate c WHERE c.champ_code = :champCode")
+    Optional<Double> getAverageRate(@Param("champCode") int champCode);
 }

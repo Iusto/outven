@@ -1,91 +1,66 @@
 package com.example.outven.repository;
 
-import java.util.List;
-
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
+import org.springframework.transaction.annotation.Transactional;
+import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import com.example.outven.entity.Board;
 
-//JpaRepository<관리대상 Entity, 대표값 자료형>
-//JpaRepository를 상속받으면 자동적으로 bean 객체로 동작된다.
 public interface BoardRepository extends JpaRepository<Board, Integer> {
 
-	// paging 처리 query
-	@Query(value = "select * from (select rownum rn, tt.* from (select * from board order by board_num desc) tt) where rn>=:startnum and rn<=:endnum", nativeQuery = true)
-	List<Board> findByStartnumAndEndnum(@Param("startnum") int startnum, @Param("endnum") int endnum);
+    // 🔹 전체 게시글 페이징 조회
+    Page<Board> findAll(Pageable pageable);
 
-	// board_category 페이징 검색
-	@Query(value = "select * from (select rownum rn, tt.* from (select * from board where board_category=:board_category order by board_num desc) tt) where rn>=:startnum and rn<=:endnum", nativeQuery = true)
-	List<Board> findByStartnumAndEndnum2(@Param("board_category") String board_category,
-			@Param("startnum") int startnum, @Param("endnum") int endnum);
+    // 🔹 특정 카테고리의 게시글 조회 (페이징 적용)
+    Page<Board> findByBoardCategory(String boardCategory, Pageable pageable);
 
-	// board_category갯수만 검색
-	@Query(value = "select count(*) from (select * from board where board_category=:board_category order by board_num desc)", nativeQuery = true)
-	int findByBoard_category(@Param("board_category") String board_category);
+    // 🔹 특정 카테고리 & 상세 카테고리 게시글 조회 (페이징 적용)
+    Page<Board> findByBoardCategoryAndDetailCategory(String boardCategory, String detailCategory, Pageable pageable);
 
-	// detail_category 페이징처리 검색
-	@Query(value = "select * from (select rownum rn, tt.* from (select * from board where board_category=:board_category and detail_category=:detail_category order by board_num desc) tt) where rn>=:startnum and rn<=:endnum", nativeQuery = true)
-	List<Board> findByStartnumAndEndnum3(@Param("board_category") String board_category,
-			@Param("detail_category") String detail_category, @Param("startnum") int startnum,
-			@Param("endnum") int endnum);
-	
-	// 추천게시판 페이징처리 (추천수 5이상만, 최신순)
-	@Query(value = "select * from (select rownum rn, tt.* from "
-			+ "(select * from board where board_recommend>=5 order by board_logtime desc) tt) "
-			+ "where rn>= :startnum and rn<= :endnum", nativeQuery = true)
-	List<Board> findByStartnumAndEndnumR(@Param("startnum") int startnum, @Param("endnum") int endnum);
-	
-	// 추천게시판 갯수 검색
-	@Query(value = "select count(*) from board where board_recommend >= 5", nativeQuery = true)
-	int findByRecommendCount();
+    // 🔹 추천수가 일정 이상인 게시글 조회 (페이징 적용)
+    Page<Board> findByRecommendGreaterThanEqual(int recommend, Pageable pageable);
 
-	// detail_category갯수만 검색
-	@Query(value = "select count(*) from (select * from board where board_category=:board_category and detail_category=:detail_category order by board_num desc)", nativeQuery = true)
-	int findByDetail_category(@Param("board_category") String board_category,
-			@Param("detail_category") String detail_category);
+    // 🔹 신고 횟수가 일정 이상인 게시글 조회 (페이징 적용)
+    Page<Board> findByReportCountGreaterThanEqual(int reportCount, Pageable pageable);
 
-	// 추천 게시판 : 추천수가 일정이상 인 게시글만 리스트로 뽑아옴 board_recommend>=:5;
-	@Query(value = "select * from (select rownum rn, tt.* from (select * from board where board_recommend>=:board_recommend order by board_num desc) tt) where rn>=:startnum and rn<=:endnum", nativeQuery = true)
-	List<Board> findByboard_recommend(@Param("board_recommend") int board_recommend, @Param("startnum") int startnum,
-			@Param("endnum") int endnum);
+    // 🔹 제목으로 검색 (페이징 적용)
+    Page<Board> findByTitleContainingAndBoardCategory(String keyword, String boardCategory, Pageable pageable);
 
-	// 신고 게시판 : 신고 횟수가 일정횟수 이상인 게시글만 리스트로 뽑아옴
-	// board_report_count>=:board_report_count
-	@Query(value = "select * from (select rownum rn, tt.* from (select * from board where board_report_count>=:board_report_count order by board_num desc) tt) where rn>=:startnum and rn<=:endnum", nativeQuery = true)
-	List<Board> findByboard_report_count(@Param("board_report_count") int board_report_count, @Param("startnum") int startnum, @Param("endnum") int endnum);
-	
-	
-	/////////////////////////////////////////////////////////////////////////////
-	// 검색기능 :Paging 처리
-	// 메인 검색 [제목]
-	@Query(value = "select * from (select rownum rn, tt.* from (select * from board WHERE board_title like :keyword order by board_num desc) tt) where rn>=:startnum and rn<=:endnum", nativeQuery = true)
-	List<Board> searchByBoard_titleAndStartAndEndnum(@Param("keyword") String keyword, @Param("startnum") int startnum, @Param("endnum") int endnum);
-	
-	
-	// 게시판 내 검색기능: 글제목
-	@Query(value = "select * from (select rownum rn, tt.* from (select * from board WHERE board_category = :board_category and board_title like :keyword order by board_num desc) tt) where rn>=:startnum and rn<=:endnum", nativeQuery = true)
-	List<Board> searchByBoard_titleAndStartnumAndEndnumAndBoardCategory(@Param("keyword") String keyword, @Param("startnum") int startnum, @Param("endnum") int endnum, @Param("board_category") String board_category);
-	
-	// 게시판 내 검색기능: 글내용
-	@Query(value = "select * from (select rownum rn, tt.* from (select * from board WHERE board_category = :board_category and board_content like :keyword order by board_num desc) tt) where rn>=:startnum and rn<=:endnum", nativeQuery = true)
-	List<Board> searchByBoard_contentAndStartnumAndEndnumAndBoardCategory(@Param("keyword") String keyword, @Param("startnum") int startnum, @Param("endnum") int endnum, @Param("board_category") String board_category);
-	
-	// 게시판 내 검색기능: 닉네임
-	@Query(value = "select * from (select rownum rn, tt.* from (select * from board WHERE board_category = :board_category and nick_name like :keyword order by board_num desc) tt) where rn>=:startnum and rn<=:endnum", nativeQuery = true)
-	List<Board> searchByNick_nameAndStartnumAndEndnumAndBoardCategory(@Param("keyword") String keyword, @Param("startnum") int startnum, @Param("endnum") int endnum, @Param("board_category") String board_category);
-	
-	// 게시판 내 검색기능: 글작성자(회원Id)
-	@Query(value = "select * from (select rownum rn, tt.* from (select * from board WHERE board_category = :board_category and member_id like :keyword order by board_num desc) tt) where rn>=:startnum and rn<=:endnum", nativeQuery = true)
-	List<Board> searchByMember_idAndStartnumAndEndnumAndBoardCategory(@Param("keyword") String keyword, @Param("startnum") int startnum, @Param("endnum") int endnum, @Param("board_category") String board_category);
-	
-	// 게시판 내 검색기능: 글제목 + 글내용
-	@Query(value = "select * from (select rownum rn, tt.* from (select * from board WHERE board_category = :board_category and board_title like :keyword OR board_category = :board_category and board_content like :keyword order by board_num desc) tt) where rn>=:startnum and rn<=:endnum", nativeQuery = true)
-	List<Board> searchByKeywordAndStartnumAndEndnumAndBoardCategory(@Param("keyword") String keyword, @Param("startnum") int startnum, @Param("endnum") int endnum, @Param("board_category") String board_category);
-	
-	// keyword갯수만 검색
-	@Query(value = "select count(*) from board " + "where board_title like :keyword "
-			+ "or board_content like :keyword ", nativeQuery = true)
-	int searchByKeyword(@Param("keyword") String keyword);
+    // 🔹 내용으로 검색 (페이징 적용)
+    Page<Board> findByContentContainingAndBoardCategory(String keyword, String boardCategory, Pageable pageable);
+
+    // 🔹 닉네임으로 검색 (페이징 적용)
+    Page<Board> findByNickNameContainingAndBoardCategory(String keyword, String boardCategory, Pageable pageable);
+
+    // 🔹 작성자(회원 ID)로 검색 (페이징 적용)
+    Page<Board> findByMemberIdContainingAndBoardCategory(String keyword, String boardCategory, Pageable pageable);
+
+    // 🔹 제목 또는 내용으로 검색 (페이징 적용)
+    Page<Board> findByTitleContainingOrContentContainingAndBoardCategory(
+        String titleKeyword, String contentKeyword, String boardCategory, Pageable pageable
+    );
+
+    // 🔹 검색된 게시글 개수 조회
+    long countByTitleContainingOrContentContaining(String keyword);
+
+    // 🔹 특정 게시글 조회
+    Optional<Board> findById(int boardNum);
+
+    // 🔹 조회수 증가 (updateHit)
+    @Transactional
+    @Modifying
+    @Query("UPDATE Board b SET b.board_hit = b.board_hit + 1 WHERE b.board_num = :boardNum")
+    void updateHit(@Param("boardNum") int boardNum);
+
+    // 🔹 특정 카테고리의 게시글 개수 조회
+    long countByBoardCategory(String boardCategory);
+
+    // 🔹 특정 상세 카테고리의 게시글 개수 조회
+    long countByBoardCategoryAndDetailCategory(String boardCategory, String detailCategory);
+
+	Page<Board> findByTitleContaining(String keyword, Pageable pageable);
 }

@@ -302,7 +302,7 @@
 										<div class="commentWrap">
 											{{#listExist}}
 											<table border="1" id="comment_table" style="width: 700px">
-												{{#boardCom}} {{^com_judge}}
+												{{#commentPage.content}} {{^com_judge}}
 												<tr>
 													<td>{{nick_name}}</td>
 													<td>{{comment_content}}</td>
@@ -347,7 +347,7 @@
 												</tr>
 												{{/com_judge}}
 											
-												{{/boardCom}}
+												{{/commentPage.content}}
 
 												<tr>
 													<td colspan="3" align="center">{{#previousPage}} [<a
@@ -380,3 +380,18 @@
 	</section>
 </article>
 {{>layouts/footer}}
+
+
+<div class="pagination">
+  {{#previousPage}}
+    <a href="?pg={{pg}}&board_num={{board.board_num}}&comPg={{previousPage}}">이전</a>
+  {{/previousPage}}
+
+  {{#pageList}}
+    <a href="?pg={{pg}}&board_num={{board.board_num}}&comPg={{.}}" {{#currentPage}}{{#eq . currentPage}}class="active"{{/eq}}{{/currentPage}}>{{.}}</a>
+  {{/pageList}}
+
+  {{#nextPage}}
+    <a href="?pg={{pg}}&board_num={{board.board_num}}&comPg={{nextPage}}">다음</a>
+  {{/nextPage}}
+</div>

@@ -3,109 +3,106 @@ package com.example.outven.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import com.example.outven.dao.ChampSkinDAO;
-import com.example.outven.dao.ChampSkinRateDAO;
-import com.example.outven.dao.ChampionDAO;
-import com.example.outven.dao.JoinComSkinDAO;
-import com.example.outven.dao.SkinCommentDAO;
 import com.example.outven.entity.Champ_skin;
 import com.example.outven.entity.Champion;
 import com.example.outven.entity.Champskinrate;
-import com.example.outven.entity.Join_comskin;
 import com.example.outven.entity.Skin_comment;
+import com.example.outven.repository.ChampSkinRateRepository;
+import com.example.outven.repository.ChampSkinRepository;
+import com.example.outven.repository.ChampionRepository;
+import com.example.outven.repository.SkinCommentRepository;
 
-// 챔피언 스킨
 @Service
 public class ChampSkinService {
-	@Autowired
-	private ChampionDAO champ_dao;
 
-	@Autowired
-	private ChampSkinDAO skinDAO;
+    @Autowired
+    private ChampionRepository championRepository;
 
-	@Autowired
-	private ChampSkinRateDAO skinRateDAO;
+    @Autowired
+    private ChampSkinRepository champSkinRepository;
 
-	@Autowired
-	private SkinCommentDAO skinCommentDAO;
-	
-	@Autowired
-	private JoinComSkinDAO joinDAO;
+    @Autowired
+    private ChampSkinRateRepository champSkinRateRepository;
 
-	// 목록보기
-	public List<Champion> champList() {
-		return champ_dao.champList();
-	}
+    @Autowired
+    private SkinCommentRepository skinCommentRepository;
 
-///////////////////////////////////
+    // ✅ 챔피언 목록 조회 (페이징 지원)
+    public Page<Champion> getChampList(Pageable pageable) {
+        return championRepository.findAll(pageable);
+    }
 
-//챔피언 스킨
+    // ✅ 특정 챔피언의 스킨 목록 조회
+    public List<Champ_skin> champSkinList(int champCode) {
+        return champSkinRepository.findByChampCode(champCode);
+    }
 
-//특정 챔피언의 스킨 리스트
-	public List<Champ_skin> champSkinList(int champ_code) {
-		return skinDAO.champSkinList(champ_code);
-	}
+    // ✅ 챔피언 스킨 상세 조회
+    public Champ_skin champSkinView(int champCode, int skinCode) {
+        return champSkinRepository.findByChampCodeAndSkinCode(champCode, skinCode);
+    }
 
-//챔피언 상세보기
-	public Champ_skin champSkinView(int champ_code, int skin_code) {
-		return skinDAO.champSkinView(champ_code, skin_code);
-	}
+    // ✅ 챔피언 스킨 평점 업데이트 (호출 방식 수정)
+    public boolean skinRateUpdate(int champCode, int skinCode, double avg) {
+        Champ_skin champskin = champSkinRepository.findByChampCodeAndSkinCode(champCode, skinCode);
+        if (champskin != null) {
+            champskin.setChamp_skin_rate(avg); // 엔티티의 필드명 확인 후 수정
+            champSkinRepository.save(champskin);
+            return true;
+        }
+        return false;
+    }
 
-//챔피언 스킨 평점 업데이트
-	public boolean skinRateUpdate(Champ_skin champskin, double avg) {
-		return skinDAO.skinRateUpdate(champskin, avg);
-	}
+    // ✅ 챔피언 스킨 평점 입력
+    public void skinRateWrite(Champskinrate champSkinRate) {
+        champSkinRateRepository.save(champSkinRate);
+    }
 
-//스킨 평점 입력
-	public boolean skinRateWrite(Champskinrate champ_skin_rate) {
-		return skinRateDAO.skinRateWrite(champ_skin_rate);
-	}
+    // ✅ 챔피언 스킨 평점 평균 구하기
+    public double skinRateAvg(int champCode, int skinCode) {
+        return champSkinRateRepository.getAverageRate(champCode, skinCode).orElse(0.0);
+    }
 
-//스킨 평점 평균 구하는 함수
-	public double skinRateAvg(int champ_code, int skin_code) {
-		return skinRateDAO.skinRateAvg(champ_code, skin_code);
-	}
-	
-	// 평점 주었는지 안주었는지 확인하는 함수
-	public boolean skinRateCheck(int champ_code, int skin_code, String member_id) {
-		return skinRateDAO.skinRateCheck(champ_code, skin_code, member_id);
-	}
+    // ✅ 챔피언 스킨 평점 중복 확인
+    public boolean skinRateCheck(int champCode, int skinCode, String memberId) {
+        return champSkinRateRepository.existsByChampCodeAndSkinCodeAndMemberId(champCode, skinCode, memberId);
+    }
 
-	///////////////////////////////////////////
+    // ✅ 챔피언 스킨 댓글 목록 조회 (페이징 적용)
+    public Page<Skin_comment> getSkinComments(int skinCode, Pageable pageable) {
+        return skinCommentRepository.findBySkinCode(skinCode, pageable);
+    }
 
-	//챔피언 스킨 댓글
+    // ✅ 챔피언 스킨 댓글 작성 (boolean 반환)
+    public boolean skinComWrite(Skin_comment comment) {
+        try {
+            skinCommentRepository.save(comment);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
-	// 챔피언 코드가 일치한 댓글들 10개 조회
-	public List<Join_comskin> champSkinCommentList(int startnum, int endnum, int champ_code) {
-		return joinDAO.champSkinCommentList(startnum, endnum, champ_code);
-	}
+    // ✅ 챔피언 스킨 답글 작성 (boolean 반환)
+    public boolean skinRecomment(Skin_comment comment) {
+        try {
+            skinCommentRepository.save(comment);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
-	//스킨 코드가 일치한 댓글들 10개 조회
-	public List<Skin_comment> skinCommentList(int startnum, int endnum, int skin_code) {
-		return skinCommentDAO.skinCommentList(startnum, endnum, skin_code);
-	}
-	
-	// 챔프 코드가 일치한 데이터의 수
-	public int getCountChamp(int champ_code) {
-		return skinCommentDAO.getCountChamp(champ_code);
-	}
-	
-	// 스킨 코드가 일치한 데이터의 수
-	public int getCountSkin(int skin_code) {
-		return skinCommentDAO.getCountSkin(skin_code);
-	}
-	
-	// 스킨 댓글 입력
-	public boolean skinComWrite(Skin_comment comment) {
-		return skinCommentDAO.skinComWrite(comment);
-	}
-	
-	// 답글
-	public boolean skinRecomment(Skin_comment comment) {
-		return skinCommentDAO.skinRecomment(comment);
-	}
-	
+    // ✅ 챔피언 코드별 댓글 개수 조회
+    public long getCountChamp(int champCode) {
+        return skinCommentRepository.countByChampCode(champCode);
+    }
 
+    // ✅ 스킨 코드별 댓글 개수 조회
+    public long getCountSkin(int skinCode) {
+        return skinCommentRepository.countBySkinCode(skinCode);
+    }
 }

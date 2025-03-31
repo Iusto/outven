@@ -1,81 +1,84 @@
 package com.example.outven.service;
 
-import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.outven.dao.AdminDAO;
-import com.example.outven.dao.EmailDAO;
-import com.example.outven.dao.MemberDAO;
-import com.example.outven.dto.memberDTO;
-import com.example.outven.entity.Blacklist;
+import com.example.outven.entity.Board;
 import com.example.outven.entity.Member;
+import com.example.outven.repository.BoardRepository;
+import com.example.outven.repository.MemberRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class AdminService {
 
-	@Autowired
-	AdminDAO dao;
-	
-	// 관리자 로그인
-	public Member Adminlogin(String id, String pw) {
-		return dao.Adminlogin(id, pw);
-	}
+    @Autowired
+    private MemberRepository memberRepository;
+    @Autowired
+    private BoardRepository boardRepository;
 
-	// 회원 조회 페이징처리
-	public List<Member> adminMemberCheck(int startnum, int endnum, String role) {
-		return dao.adminMemberCheck(startnum, endnum, role);
-	}
-	
-	// 블랙리스트 페이징처리
-	public List<Member> adminBlacklistMemberCheck(int startnum, int endnum) {
-		return dao.adminBlacklistMemberCheck(startnum, endnum);
-	}
-	
-	// 블랙리스트 회원 조회 데이터 갯수
-	public int BlacklistMemberCount() {
-		return dao.BlacklistMemberCount();
-	}
-	
-	// 회원 조회
-	public List<Member> adminMemberCheckTab(String role) {
-		return dao.adminMemberCheckTab(role);
-	}
-	
-	// 회원 조회 데이터 갯수
-	public int memberCount(String role) {
-		return dao.memberCount(role);
-	}
-	
-	// 관리자 임명
-	public boolean appointAdmin(String id) {
-		return dao.appointAdmin(id);
-	}
-	
-	// 관리자 해임
-	public boolean dismissAdmin(String id) {
-		return dao.dismissAdmin(id);
-	}
+    // 🔹 특정 역할(role)에 해당하는 회원을 조회 (페이징 적용)
+    public Page<Member> getMembersByRole(String role, Pageable pageable) {
+        return memberRepository.findByRole(role, pageable);
+    }
 
-	// [관리자]회원 정보수정
-	public boolean modifyMember(String id, String member_level, String member_exp) {
-		return dao.modifyMember(id, member_level, member_exp);
-	}
-	
-	// [관리자]회원 추방
-	public boolean exileMember(String id) {
-		return dao.exileMember(id);
-	}
-	
-	// [관리자]블랙리스트 해제
-	public boolean exileMemberCancel(String id) {
-		return dao.exileMemberCancel(id);
-	}
+    // 🔹 관리자 로그인
+    public Member Adminlogin(String id, String pw) {
+        return memberRepository.findByMemberIdAndPassword(id, pw);
+    }
 
-	// [관리자] 게시글 이동
-	public boolean adminBoardMove(int board_num, String board_category, String detail_category) {
-		return dao.adminBoardMove(board_num, board_category, detail_category);
-	}
+    // 🔹 관리자 임명
+    public boolean appointAdmin(String memberId) {
+        int updatedRows = memberRepository.updateMemberRole(memberId, "ADMIN");
+        return updatedRows > 0;
+    }
+
+    // 🔹 관리자 해임
+    public boolean dismissAdmin(String memberId) {
+        int updatedRows = memberRepository.updateMemberRole(memberId, "USER");
+        return updatedRows > 0;
+    }
+
+    // 🔹 회원 정보 수정
+    public boolean modifyMember(String memberId, String level, String exp) {
+        try {
+            int parsedLevel = Integer.parseInt(level);
+            int updatedRows = memberRepository.updateMemberInfo(memberId, parsedLevel, exp);
+            return updatedRows > 0;
+        } catch (NumberFormatException e) {
+            // level이 숫자가 아닐 경우 예외 처리
+            return false;
+        }
+    }
+
+    // 🔹 회원 블랙리스트 등록
+    public boolean exileMember(String memberId) {
+        int updatedRows = memberRepository.updateMemberRole(memberId, "BLACKLIST");
+        return updatedRows > 0;
+    }
+
+    // 🔹 블랙리스트 해제
+    public boolean exileMemberCancel(String memberId) {
+        int updatedRows = memberRepository.updateMemberRole(memberId, "USER");
+        return updatedRows > 0;
+    }
+    
+    @Transactional
+    public boolean adminBoardMove(int boardNum, String boardCategory, String detailCategory) {
+        Optional<Board> boardOptional = boardRepository.findById(boardNum);
+        if (boardOptional.isPresent()) {
+            Board board = boardOptional.get();
+            board.setBoard_category(boardCategory);
+            board.setDetail_category(detailCategory);
+            boardRepository.save(board);
+            return true;
+        }
+        return false;
+    }
+
 }

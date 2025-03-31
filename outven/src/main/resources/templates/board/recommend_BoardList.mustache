@@ -93,7 +93,7 @@ $(function(){
 									<th>추천</th>
 								</tr>
 							<tbody>
-								{{#list}}
+								{{#page.content}}
 									<tr>
 										<td>{{board_num}}</td>
 										<td><a href="/board/recommend_BoardView?board_num={{board_num}}&pg={{pg}}&detail_category={{detail_category}}" id="subjectA" >[{{detail_category}}] {{board_title}}</a></td>
@@ -102,7 +102,7 @@ $(function(){
 										<td>{{board_hit}}</td>
 										<td>{{board_recommend}}</td>
 									</tr>
-								{{/list}}
+								{{/page.content}}
 								<tr>
 							  	<td colspan="6" align="center">
 							  	{{#previousPage}}
@@ -168,3 +168,18 @@ $(function(){
 </article>
 
 {{>layouts/footer}}
+
+
+<div class="pagination">
+  {{#previousPage}}
+    <a href="?page={{previousPage}}&name={{name}}&keyword={{keyword}}">이전</a>
+  {{/previousPage}}
+
+  {{#pageList}}
+    <a href="?page={{.}}&name={{name}}&keyword={{keyword}}" {{#currentPage}}{{#eq . currentPage}}class="active"{{/eq}}{{/currentPage}}>{{.}}</a>
+  {{/pageList}}
+
+  {{#nextPage}}
+    <a href="?page={{nextPage}}&name={{name}}&keyword={{keyword}}">다음</a>
+  {{/nextPage}}
+</div>

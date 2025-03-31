@@ -114,7 +114,7 @@ $(document).ready(function() {
 									<th>추천</th>
 								</tr>
 							<tbody>
-								{{#list}}
+								{{#page.content}}
 									{{^detail_category}}
 										<tr>
 											<td>{{board_num}}</td>
@@ -135,7 +135,7 @@ $(document).ready(function() {
 											<td>{{board_recommend}}</td>
 										</tr>
 									{{/detail_category}}
-								{{/list}}
+								{{/page.content}}
 								<tr>
 							  	<td colspan="6" align="center">
 							  	{{#previousPage}}
@@ -201,3 +201,34 @@ $(document).ready(function() {
 </article>
 
 {{>layouts/footer}}
+
+
+<div class="pagination">
+  {{#page.hasPrevious}}
+    <a href="?page={{page.numberMinusOne}}">이전</a>
+  {{/page.hasPrevious}}
+
+  {{#page.pageNumbers}}
+    <a href="?page={{.}}" {{#isCurrent}}class="active"{{/isCurrent}}>{{.}}</a>
+  {{/page.pageNumbers}}
+
+  {{#page.hasNext}}
+    <a href="?page={{page.numberPlusOne}}">다음</a>
+  {{/page.hasNext}}
+</div>
+
+
+
+<div class="pagination">
+  {{#previousPage}}
+    <a href="?page={{previousPage}}&name={{name}}&keyword={{keyword}}">이전</a>
+  {{/previousPage}}
+
+  {{#pageList}}
+    <a href="?page={{.}}&name={{name}}&keyword={{keyword}}" {{#currentPage}}{{#eq . currentPage}}class="active"{{/eq}}{{/currentPage}}>{{.}}</a>
+  {{/pageList}}
+
+  {{#nextPage}}
+    <a href="?page={{nextPage}}&name={{name}}&keyword={{keyword}}">다음</a>
+  {{/nextPage}}
+</div>

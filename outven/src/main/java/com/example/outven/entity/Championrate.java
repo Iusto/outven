@@ -1,29 +1,31 @@
 package com.example.outven.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.SequenceGenerator;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
-// 평점
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "championrate")
 public class Championrate {
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE,
-			generator = "RATE_SEQUENCE_GENERATOR")
-	@SequenceGenerator(name = "RATE_SEQUENCE_GENERATOR",
-	sequenceName = "rate_seq", initialValue = 1,
-	allocationSize = 1)
-	private int rate_num;
-	private int champ_code; 	// 챔피언 코드
-	private String member_id;		// 유저 id
-	private int rate;			// 챔피언 평점
-	
-}	
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    @Column(name = "champ_code", nullable = false)
+    private int champ_code;
+
+    @Column(name = "rate", nullable = false)
+    private int rate;
+
+    @Column(name = "member_id", nullable = false)
+    private String member_id;
+
+    // 추가된 생성자
+    public Championrate(int champCode, int rate, String memberId) {
+        this.champ_code = champCode;
+        this.rate = rate;
+        this.member_id = memberId;
+    }
+}

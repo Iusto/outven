@@ -1,86 +1,115 @@
 package com.example.outven.service;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import com.example.outven.dao.ChampionCommentDAO;
-import com.example.outven.dao.ChampionDAO;
-import com.example.outven.dao.ChampionRateDAO;
 import com.example.outven.entity.Champion;
 import com.example.outven.entity.Champion_comment;
 import com.example.outven.entity.Championrate;
+import com.example.outven.repository.ChampionRepository;
+import com.example.outven.repository.ChampionRateRepository;
+import com.example.outven.repository.ChampionCommentRepository;
 
-// 챔피언 정보 서비스
+import java.util.List;
+import java.util.Optional;
+
 @Service
 public class ChampionService {
 
-	@Autowired
-	private ChampionDAO champ_dao;
+    @Autowired
+    private ChampionRepository championRepository;
 
-	@Autowired
-	private ChampionRateDAO champRate_dao;
+    @Autowired
+    private ChampionRateRepository championRateRepository;
 
-	@Autowired
-	private ChampionCommentDAO commentDAO;
+    @Autowired
+    private ChampionCommentRepository championCommentRepository;
 
-	// champ_dao 부분
-	
-	// 목록보기
-	public List<Champion> champList() {
-		return champ_dao.champList();
-	}
 
-	// 상세보기
-	public Champion championView(int champion_code) {
-		return champ_dao.championView(champion_code);
-	}
-	
-	// 챔피언 평점 업데이트
-	public boolean champRateUpdate(int champ_code, double avg) {
-		return champ_dao.champRateUpdate(champ_code, avg);
-	}
+    // 🔹 챔피언 상세 조회
+    public Champion championView(int championCode) {
+        return championRepository.findById(championCode)
+                .orElseThrow(() -> new IllegalArgumentException("해당 챔피언이 존재하지 않습니다: " + championCode));
+    }
 
-	
-	// champRate_dao 부분
-	
-	// 평점 입력
-	public boolean champRateWrite(Championrate championRate) {
-		return champRate_dao.champRateWrite(championRate);
-	}
+    // 🔹 챔피언 평점 입력 (중복 방지)
+    public boolean champRateWrite(Championrate championRate) {
+        try {
+            if (champRateCheck(championRate.getChamp_code(), championRate.getMember_id())) {
+                return false; // 중복 방지
+            }
+            championRateRepository.save(championRate);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace(); // 오류 로그 출력
+            return false;
+        }
+    }
 
-	// 평점 평균 구하기
-	public double champRateAvg(int champ_code) {
-		return champRate_dao.champRateAvg(champ_code);
-	}
 
-	// 평점 주었는지 안주었는지 확인하는 함수
-	public boolean champRateCheck(int champ_code, String member_id) {
-		return champRate_dao.champRateCheck(champ_code, member_id);
-	}
 
-	
-	// commentDAO 부분
-	
-	// 댓글 리스트 :챔프 코드와 일치한 댓글들을 10개 조회
-	public List<Champion_comment> champCommentList(int startnum, int endnum, int champ_code) {
-		return commentDAO.champCommentList(startnum, endnum, champ_code);
-	}
 
-	// 챔프 코드와 일치한 데이터수를 구함
-	public int getCount(int champ_code) {
-		return commentDAO.getCount(champ_code);
-	}
+    // 🔹 챔피언 평균 평점 계산
+    public double champRateAvg(int champCode) {
+        return championRateRepository.getAverageRate(champCode).orElse(0.0);
+    }
 
-	// 댓글 입력
-	public boolean commentWrite(Champion_comment comment) {
-		return commentDAO.commentWrite(comment);
-	}
+    // 🔹 평점이 이미 존재하는지 확인
+    public boolean champRateCheck(int champCode, String memberId) {
+        return championRateRepository.existsByChamp_codeAndMember_id(champCode, memberId);
+    }
 
-	// 답글
-	public boolean recomment(Champion_comment comment) {
-		return commentDAO.recomment(comment);
-	}
 
+    // 🔹 챔피언 평점 업데이트
+    public boolean champRateUpdate(int champCode, double avg) {
+        Optional<Champion> optionalChampion = championRepository.findById(champCode);
+        if (optionalChampion.isPresent()) {
+            Champion champion = optionalChampion.get();
+            champion.setChamp_rate(avg);
+            championRepository.save(champion);
+            return true;
+        }
+        return false;
+    }
+
+    // 🔹 챔피언 댓글 페이징 조회
+    public Page<Champion_comment> getCommentsByChampion(int champCode, Pageable pageable) {
+        return championCommentRepository.findByChampCode(champCode, pageable);
+    }
+
+    // 🔹 챔피언 댓글 작성
+    public boolean commentWrite(Champion_comment comment) {
+        try {
+            championCommentRepository.save(comment);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // 🔹 챔피언 답글 작성
+    public boolean recomment(Champion_comment comment) {
+        try {
+            championCommentRepository.save(comment);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // 🔹 챔피언 코드별 댓글 개수 조회
+    public long getCount(int champCode) {
+        return championCommentRepository.countByChampCode(champCode);
+    }
+    
+    // 챔피언 목록 조회 (페이징 적용)
+    public Page<Champion> champList(Pageable pageable) {
+        return championRepository.findAll(pageable);
+    }
+
+    // 챔피언 목록을 List<Champion>으로 변환하여 반환
+    public List<Champion> getChampListAsList(Pageable pageable) {
+        return championRepository.findAll(pageable).getContent();
+    }
 }

@@ -1,22 +1,17 @@
 package com.example.outven.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import com.example.outven.dao.MemberDAO;
 import com.example.outven.dto.memberDTO;
-import com.example.outven.entity.Board;
 import com.example.outven.entity.Member;
-import com.example.outven.repository.MemberRepository;
 import com.example.outven.service.BoardService;
 import com.example.outven.service.MemberService;
 
-import jakarta.mail.Session;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
@@ -158,12 +153,9 @@ public class MemberController {
 	
 	// 가입
 	@PostMapping("/join")
-	public String join(memberDTO member, HttpServletRequest request) {
-		boolean result = memberService.joinMember(member);
-		if (result) {
-			return "member/joinOk";
-		}
-		return "member/joinFail";
+	public String join(@ModelAttribute memberDTO member) {
+	    boolean result = memberService.joinMember(member);
+	    return result ? "member/joinOk" : "member/joinFail";
 	}
 	
 	// 아이디 찾기

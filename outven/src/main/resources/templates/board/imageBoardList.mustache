@@ -253,7 +253,7 @@
 					<br>
 					<!-- 이미지 article -->
 					<div class="image-grid">
-						{{#list}}
+						{{#page.content}}
 						<div class="grid-item" onclick="location.href='/board/imageBoardView?board_num={{board_num}}&pg={{pg}}'">
 							<p>{{detail_category}}</p>
 								{{#board_img}}
@@ -283,7 +283,7 @@
 								</div>
 							</div>
 						</div>
-						{{/list}}
+						{{/page.content}}
 					</div>
 					<br> <br>
 					<div class="post_area" style="width: 750px; margin: auto;">
@@ -363,3 +363,18 @@
 			</section>
 </article>
 {{>layouts/footer}}
+
+
+<div class="pagination">
+  {{#previousPage}}
+    <a href="?page={{previousPage}}">이전</a>
+  {{/previousPage}}
+
+  {{#pageList}}
+    <a href="?page={{.}}" {{#currentPage}}{{#eq . currentPage}}class="active"{{/eq}}{{/currentPage}}>{{.}}</a>
+  {{/pageList}}
+
+  {{#nextPage}}
+    <a href="?page={{nextPage}}">다음</a>
+  {{/nextPage}}
+</div>

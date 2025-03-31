@@ -1,41 +1,32 @@
 package com.example.outven.repository;
 
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.outven.entity.Member;
 
-// JpaRepository<관리대상 Entity, 대표값 자료형(primary Key)>
-// JpaRepository를 상속받으면 자동적으로 bean 객체로 동작된다.
 public interface MemberRepository extends JpaRepository<Member, String> {
-	
-	// 이메일 인증 중복 검사
-	@Query(value = "select * from member "
-				 + "where email = :email", nativeQuery = true)
-	Member findByEmail(@Param("email") String email);
-	
-	// 해당 아이디와 이메일로 가입된 멤버가 있는지 검색
-	@Query(value = "select * from member "
-				 + "where member_id = :id and email = :email", nativeQuery = true)
-	Member findByIdAndEmail(@Param("id") String id,
-							@Param("email") String email);
-	
-	// 해당 닉네임이 있는지 검색 (닉네임 중복 검사)
-	@Query(value = "select * from member "
-			 + "where nick_name = :nick", nativeQuery = true)
-	Member findByNick(@Param("nick") String nick);
 
-	// 아이디 이메일 맞는 유저 검색
-	@Query(value = "select * from member "
-			 + "where membername = :name and email = :email", nativeQuery = true)
-	Member findByNameEmail(@Param("name") String name,
-						   @Param("email") String email);
-	
-	// 아이디 비밀번호 맞는 유저 검색
-	@Query(value = "select * from member "
-			 + "where member_id = :id and user_password  = :password", nativeQuery = true)
-	Member findByIdAndPassword(@Param("id") String id,
-						   	   @Param("password") String password);
+    // 🔹 특정 역할(role)에 해당하는 회원을 조회 (페이징 적용)
+    Page<Member> findByRole(String role, Pageable pageable);
+
+    // 🔹 ID와 비밀번호로 회원 조회 (로그인)
+    Member findByMemberIdAndPassword(String memberId, String password);
+
+    // 🔹 회원의 역할(role) 변경 (관리자 임명 / 해임 / 블랙리스트 등록)
+    @Transactional
+    @Modifying
+    @Query("UPDATE Member m SET m.role = :role WHERE m.member_id = :memberId")
+    int updateMemberRole(@Param("memberId") String memberId, @Param("role") String role);
+
+    // ✅ 회원 정보 업데이트 (레벨 & 경험치 수정)
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE member SET member_level = :level, member_exp = CAST(:exp AS CHAR) WHERE member_id = :memberId", nativeQuery = true)
+    int updateMemberInfo(@Param("memberId") String memberId, @Param("level") int level, @Param("exp") String exp);
 }
