@@ -41,4 +41,14 @@ public class Member {
     private String memberExp;  		// 경험치
     @Column(name = "role")
     private String role;			// 역할
+    
+    private boolean blacklist; // ✅ 블랙리스트 여부
+
+    public boolean isBlacklist() {
+        return blacklist;
+    }
+
+    public void setBlacklist(boolean blacklist) {
+        this.blacklist = blacklist;
+    }
 }
