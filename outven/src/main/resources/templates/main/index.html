@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Outven - 홈</title>
+  <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+  <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+<style>
+.sidebar-container {
+  background-color: #f8f9fa;
+  border-right: 1px solid #ddd;
+}
+
+.sidebar-hover {
+  padding: 1rem;
+  height: 100%;
+  overflow: hidden;
+}
+
+.sidebar-tab {
+  position: absolute;
+  top: 50%;
+  right: -15px;
+  transform: translateY(-50%);
+  background-color: #e9ecef;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-left: none;
+  cursor: pointer;
+}
+
+.main-content {
+  padding: 1rem;
+}
+</style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+  <!-- Header & Nav 포함한 상단 구조 -->
+  <header th:replace="layouts/header :: header"></header>
+  <nav th:replace="layouts/nav :: nav"></nav>
+
+  <!-- 전체 레이아웃 래퍼 -->
+  <div class="d-flex" style="flex: 1 1 auto;">
+    
+    <!-- Sidebar (fixed 제거 → flex로 배치) -->
+    <div class="sidebar-container">
+      <div class="sidebar-hover" th:replace="layouts/sidebar :: sidebar"></div>
+      <div class="sidebar-tab">
+        <i class="bi bi-chevron-right"></i>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content flex-grow-1">
+      <main class="container-fluid py-4">
+      <section th:fragment="center">
+        <!-- 추천 게시판 -->
+        <div class="mb-5">
+          <h3 class="border-bottom pb-2">
+            추천 게시판
+            <a th:href="@{/board/recommend_BoardList}" class="float-end btn btn-sm btn-outline-secondary">더보기</a>
+          </h3>
+          <ul class="list-group">
+            <li class="list-group-item" th:each="post : ${recommend_board}">
+              <a th:href="@{/board/recommend_BoardView(board_num=${post.board_num}, pg=1, detail_category=${post.detail_category})}"
+                 th:text="${post.board_title}">제목</a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- 이미지 게시판 -->
+        <div class="mb-5">
+          <h3 class="border-bottom pb-2">
+            팬아트 & 카툰 갤러리
+            <a th:href="@{/board/imageBoardList}" class="float-end btn btn-sm btn-outline-secondary">더보기</a>
+          </h3>
+          <div class="row" th:each="img : ${art_board}">
+            <div class="col-6 col-md-3 mb-3">
+              <div class="card h-100">
+                <img th:src="@{'/storage/' + ${img.board_img}}" class="card-img-top" alt="이미지">
+                <div class="card-body">
+                  <h6 class="card-title" th:text="${img.board_title}">제목</h6>
+                  <p class="card-text text-muted" th:text="${img.nick_name}">작성자</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 나머지 게시판 4개 -->
+        <div class="row">
+          <!-- 패치 & 정보 게시판 -->
+          <div class="col-md-6">
+            <h4 class="border-bottom pb-1 d-flex justify-content-between align-items-center">
+              <span>패치 & 정보 게시판</span>
+              <a th:href="@{/board/patchBoardList}" class="btn btn-sm btn-outline-secondary">더보기</a>
+            </h4>
+            <ul class="list-group mb-4">
+              <li class="list-group-item" th:each="post : ${patch_board}">
+                <a th:href="@{/board/patchBoardView(board_num=${post.board_num}, pg=1, detail_category=${post.detail_category})}"
+                   th:text="${post.board_title}"></a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- 팁 & 공략 게시판 -->
+          <div class="col-md-6">
+            <h4 class="border-bottom pb-1 d-flex justify-content-between align-items-center">
+              <span>팁 & 공략 게시판</span>
+              <a th:href="@{/board/tipBoardList}" class="btn btn-sm btn-outline-secondary">더보기</a>
+            </h4>
+            <ul class="list-group mb-4">
+              <li class="list-group-item" th:each="post : ${tip_board}">
+                <a th:href="@{/board/tipBoardView(board_num=${post.board_num}, pg=1, detail_category=${post.detail_category})}"
+                   th:text="${post.board_title}"></a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- 포지션 게시판 -->
+          <div class="col-md-6">
+            <h4 class="border-bottom pb-1 d-flex justify-content-between align-items-center">
+              <span>포지션 게시판</span>
+              <a th:href="@{/board/positionBoardList}" class="btn btn-sm btn-outline-secondary">더보기</a>
+            </h4>
+            <ul class="list-group mb-4">
+              <li class="list-group-item" th:each="post : ${position_board}">
+                <a th:href="@{/board/positionBoardView(board_num=${post.board_num}, pg=1, detail_category=${post.detail_category})}"
+                   th:text="${post.board_title}"></a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- 사건 & 사고 게시판 -->
+          <div class="col-md-6">
+            <h4 class="border-bottom pb-1 d-flex justify-content-between align-items-center">
+              <span>사건 & 사고 게시판</span>
+              <a th:href="@{/board/accidentBoardList}" class="btn btn-sm btn-outline-secondary">더보기</a>
+            </h4>
+            <ul class="list-group mb-4">
+              <li class="list-group-item" th:each="post : ${acc_board}">
+                <a th:href="@{/board/accidentBoardView(board_num=${post.board_num}, pg=1, detail_category=${post.detail_category})}"
+                   th:text="${post.board_title}"></a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer th:replace="layouts/footer :: footer"></footer>
+</body>
+</html>

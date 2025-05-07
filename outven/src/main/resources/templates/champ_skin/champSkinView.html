@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<title>Champskinview</title>
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<header th:replace="layouts/header :: header"></header>
+<nav th:replace="layouts/nav :: nav"></nav>
+<main class="container my-4 flex-grow-1">
+<span th:text="&gt;layouts/header">
+<style>
+.champimg1{
+	float: center;
+	padding: 10px;
+}
+hr{
+	clear: both;
+}
+.champlist {
+    text-align: center;
+    list-style: none; /* Remove default list styling */
+    padding: 0; /* Remove default padding */
+}
+
+.listWrap{
+	
+    background-color: navy; /* 남색 배경색 적용 */
+}
+
+.champlist li {
+    display: inline-block; 
+    margin: 0 10px; 
+    vertical-align: top; 
+    color: white; /* 글자색을 흰색으로 설정 */
+    padding: 10px; /* 내부 여백 추가 */
+}
+
+#imid_bc7508c96f3cc48 .common-title::before {
+    background: #074f68; /* 가상 요소에 배경색 지정 */
+
+}
+
+#imid_bc7508c96f3cc48 .common-title {
+    background: #047e99; /* 요소에 배경색 지정 */
+    color: #ffffff; /* 글자색 지정 */
+}
+
+
+</style>
+<article>
+<span th:text="&gt;layouts/nav">
+<section class="commu-center">
+<script src="../js/jquery-3.7.1.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+		$(function(){
+		// 24/02/21 수정 : 로그인 유무 확인
+			$(".rateBtn").click(function(){
+				<span th:text="^member">
+				alert("로그인부터 해주세요");
+				return false;
+				</div>member">	
+				
+				<span th:text="#member">
+				// alert("진입 확인");
+				const urlParams = new URL(location.href).searchParams;
+				const name = urlParams.get('name');
+				const champ_code = urlParams.get('champ_code');
+				const skin_code  = urlParams.get('skin_code');
+				var member_id = $("#hiddenData").data("id");
+				var rate = $(this).data("rate");
+				// alert("champ_code : " + champ_code + " skin_code : " + skin_code + " rate : " + rate +" member_id : " + member_id);
+				$.ajax({
+					type : "POST",
+					url : "/checkSkinRate",
+					data : {
+						"champ_code" : champ_code,
+						"skin_code" : skin_code,
+						"member_id" : member_id
+					},
+					success : function(data){
+						if(data == true){
+							alert("평점은 한번만 줄 수 있습니다.");
+							return false;
+						}else{
+							location.href="/champ_skin/skinRateUpdate?champ_code="+champ_code+"&skin_code="+skin_code+"&rate="+rate;
+						}
+					}
+				});
+				
+				return false;
+				</div>member">
+			});
+		
+			// 댓글 입력 기능 눌렀을때 member값이 없으면 로그인 해주세요 창 뛰움
+			$("#write").click(function(){
+			<span th:text="^member">
+				alert("로그인부터 해주세요");
+				return false;
+			</div>member">
+						
+			<span th:text="#member">
+				var frm1 = document.comWrite;
+				if(!frm1.champskin_com.value){
+				alert("내용을 입력해주세요");
+				frm1.champskin_com.focus;
+				return false;
+				}
+				frm1.submit();
+			</div>member">
+			});	
+	
+			// 답글 기능 숨기기
+			$(".recomment").hide();
+			$(".rc_btn").click(function(){
+				// 아이디가 없을때 로그인 하라고 알림창 뜨기
+				<span th:text="^member">
+				alert("로그인부터 해주세요");
+				return false;
+				</div>member">
+				$(".recomment").slideUp(10);
+				// alert("test");
+				$('.reText').val('');
+				// 답글버튼(input의 부모 td tr next .recomment)
+				// 답글 버튼을 눌렀을때 활성화
+				//$(this).parent("tr").next().children().slideDown(10);
+				$(this).parent().parent().next().children().slideDown(10);
+			});
+			
+			
+			
+		});
+	</script>
+<section class="commu-common" id="imid_bc7508c96f3cc48">
+<h2 class="common-title">
+<span class="main">챔피언 스킨</span> <span class="sub"></span>
+</h2>
+</section>
+<!-- 로그인 성공시 있는 데이터 -->
+<span th:text="#member"><input data-id="&lt;span th:text=" id="hiddenData" member_id"="" type="hidden"/>"&gt;member"&gt;
+		<div class="listWrap">
+<ul class="champlist">
+<span th:text="#champ_skin_list">
+<li class="champimg1">
+<a champ_code"="" class="" href="/champ_skin/champSkinView?champ_code=&lt;span th:text=">&amp;skin_code=<span th:text="skin_code">" class="champ_img_button" data-skincode="<span th:text="skin_code">" data-champcode="<span th:text="champ_code">"&gt;
+				<img alt="" champ_skin_img"="" src="../champ_skin_img/&lt;span th:text="/>" width="200px" height="120px"&gt;</span></span></span></a>
+<p><nobr><span th:text="champ_skin_name"></span></nobr></p>
+<p><span th:text="champ_skin_rate"></span></p>
+</li>
+</span></ul></div>champ_skin_list"&gt;
+		
+
+<hr/>
+<!-- 댓글 테이블 스킨을 클릭하면 없어짐-->
+<span th:text="#listExist">
+<div align="center" class="skin_comment">
+<table border="1" style="width: 700px;">
+<tr>
+<th>스킨</th>
+<th>스킨 평가</th>
+<th>작성자</th>
+</tr>
+<span th:text="#champCom">
+<tr>
+<td width="64px;"><img champ_icon_img"="" src="../champ_skin_icon_img/&lt;span th:text="/>"&gt;</td>
+<td><h5><span th:text="champ_skin_name"></span></h5> <span th:text="champ_skin_rate"><br/>
+<span th:text="champskin_com">
+</span></span></td>
+<td><span th:text="nick_name"><br/>
+<span th:text="comment_logtime">
+</span></span></td>
+</tr>
+</span></table></div>champCom"&gt;
+				<!-- 페이징 부분 -->
+<tr>
+<td align="center" colspan="3">
+<span th:text="#previousPage"> [<a champ_code"="" class="paging" href="champSkinView?champ_code=&lt;span th:text=">&amp;pg=<span th:text="previousPage">"&gt;이전</span></a>]
+					previousPage"&gt; 
+						<span th:text="#pageList">
+<span th:text="#current"> 
+						[<a champ_code"="" class="currentPaging" href="champSkinView?champ_code=&lt;span th:text=">&amp;pg=<span th:text="page">"&gt;<span th:text="page"></span></span></a>]
+						current"&gt; 
+						
+						<span th:text="^current"> 
+						[<a champ_code"="" class="paging" href="champSkinView?champ_code=&lt;span th:text=">&amp;pg=<span th:text="page">"&gt;<span th:text="page"></span></span></a>]
+						current"&gt; 
+						pageList"&gt; 
+						
+						<span th:text="#nextPage"> [<a champ_code"="" class="paging" href="champSkinView?champ_code=&lt;span th:text=">&amp;pg=<span th:text="nextPage">"&gt;다음</span></a>]
+						nextPage"&gt;
+				</span></span></span></span></span></td>
+</tr>
+
+
+listExist"&gt;
+		
+		
+		<!-- 챔프 상세보기 -->
+<span th:text="#detail_view">
+<div id="detail">
+<p><span th:text="champ_skin_name"> rp : <span th:text="skin_rp"></span></span></p>
+<br/>
+<img alt="" champ_skin_img"="" src="../champ_skin_img/&lt;span th:text="/>" style="width: 500px; height: 300px;"&gt;				
+				<table class="sk_table">
+<br/>
+<tr>
+<td colspan="5">내가 생각하는 챔피언의 점수는?</td>
+</tr>
+<tr>
+<td><a class="rateBtn" data-rate="1" href="#">
+							최악 1점   </a></td>
+<td><a class="rateBtn" data-rate="2" href="#">
+							별로 2점   </a></td>
+<td><a class="rateBtn" data-rate="3" href="#">
+							보통 3점   </a></td>
+<td><a class="rateBtn" data-rate="4" href="#">
+							우수 4점   </a></td>
+<td><a class="rateBtn" data-rate="5" href="#">
+							최고 5점 </a></td>
+</tr>
+</table>
+</div>detail_view"&gt;
+		
+<br/><br/>
+<!-- 스킨 클릭했을때 나오는 댓글 리스트 -->
+<span th:text="#skinExist">
+<table border="1" style="width: 700px">
+<tr>
+<th>닉네임</th>
+<th>스킨 평가</th>
+<th>게시일</th>
+</tr>
+<span th:text="#skinCom">
+<span th:text="^com_judge">
+<tr>
+<td><span th:text="nick_name"></span></td>
+<td><span th:text="champskin_com"></span></td>
+<td><span th:text="comment_logtime"><br/>
+<input class="rc_btn" data-num="&lt;span th:text=" skin_com_num"="" type="button" value="답글"/>"&gt; : <a href="#">신고</a>
+</span></td>
+</tr>
+<tr>
+<td class="recomment" colspan="3">
+<form action="/champ_skin/recomment" class="recomform" method="post" name="form1">
+<input name="skin_re_ref" skin_com_num"="" type="hidden" value="&lt;span th:text="/>"&gt;
+						<input name="skin_re_lev" skin_re_lev"="" type="hidden" value="&lt;span th:text="/>"&gt;
+						<input name="skin_re_seq" skin_re_seq"="" type="hidden" value="&lt;span th:text="/>"&gt;
+						<input champ_code"="" name="champ_code" type="hidden" value="&lt;span th:text="/>"&gt;
+						<input name="skin_code" skin_code"="" type="hidden" value="&lt;span th:text="/>"&gt;
+						<input name="pg" pg"="" type="hidden" value="&lt;span th:text="/>"&gt;
+						<table style="width: 700px">
+<tr>
+<td><textarea class="reText" cols="80" name="champskin_com" rows="5"></textarea></td>
+<td><input type="submit" value="등록"/></td>
+</tr>
+</table>
+</form>
+</td>
+</tr>
+com_judge"&gt;
+				
+				<span th:text="#com_judge">
+<tr>
+<td><span th:text="nick_name"></span></td>
+<td> └  <span th:text="champskin_com"></span></td>
+<td><span th:text="comment_logtime"><br/>
+<a href="#">신고</a>
+</span></td>
+</tr>
+com_judge"&gt;
+				
+				
+				
+				skinCom"&gt;
+				<tr>
+<td align="center" colspan="3">
+<span th:text="#previousPage"> [<a champ_code"="" class="paging" href="champSkinView?champ_code=&lt;span th:text=">&amp;skin_code=<span th:text="skin_code">&amp;pg=<span th:text="previousPage">"&gt;이전</span></span></a>]
+					previousPage"&gt; 
+						<span th:text="#pageList">
+<span th:text="#current"> 
+						[<a champ_code"="" class="currentPaging" href="champSkinView?champ_code=&lt;span th:text=">&amp;skin_code=<span th:text="skin_code">&amp;pg=<span th:text="page">"&gt;<span th:text="page"></span></span></span></a>]
+						current"&gt; 
+						
+						<span th:text="^current"> 
+						[<a champ_code"="" class="paging" href="champSkinView?champ_code=&lt;span th:text=">&amp;skin_code=<span th:text="skin_code">&amp;pg=<span th:text="page">"&gt;<span th:text="page"></span></span></span></a>]
+						current"&gt; 
+						pageList"&gt; 
+						
+						<span th:text="#nextPage"> [<a champ_code"="" class="paging" href="champSkinView?champ_code=&lt;span th:text=">&amp;skin_code=<span th:text="skin_code">&amp;pg=<span th:text="nextPage">"&gt;다음</span></span></a>]
+						nextPage"&gt;
+				</span></span></span></span></span></td>
+</tr>
+</span></span></span></table>
+skinExist"&gt;
+		
+			
+		<br/>
+<span th:text="#commentView">
+<h2>댓글 입력</h2>
+<form action="/champ_skin/skinComWrite" method="post" name="comWrite">
+<input pg"="" type="hidden" value="&lt;span th:text="/>" name="pg"&gt;
+			<input champ_code"="" type="hidden" value="&lt;span th:text="/>" name="champ_code"&gt;
+			<input skin_code"="" type="hidden" value="&lt;span th:text="/>" name="skin_code"&gt;
+			<table border="1" id="wrtieCom">
+<tr>
+<td><textarea cols="112" name="champskin_com" rows="5"></textarea></td>
+<td><input id="write" type="button" value="등록"/></td>
+</tr>
+</table>
+</form>
+commentView"&gt;
+	</span></span></span></span></span></section>
+</span></article>
+</span></main>
+<footer th:replace="layouts/footer :: footer"></footer>
+</body>
+</html>

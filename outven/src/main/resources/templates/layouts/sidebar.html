@@ -1,0 +1,65 @@
+<aside class="bg-white p-3 border-end shadow-sm"
+       style="width: 260px; overflow-y: auto; max-height: calc(100vh - 100px);"
+       th:fragment="sidebar">
+
+  <!-- 로그인/회원 정보 -->
+  <div class="card p-3 mb-4">
+    <h5 class="mb-3">
+      <a th:href="@{/index}" class="text-decoration-none fw-bold text-dark">
+        리그오브레전드<br>아웃벤
+      </a>
+    </h5>
+
+    <!-- 비로그인 -->
+    <div th:if="${member == null}">
+      <p class="small mb-2">
+        로그인하고<br><span class="text-primary fw-semibold">출석보상</span> 받으세요!
+      </p>
+      <button class="btn btn-outline-dark btn-sm w-100 mb-2" th:onclick="|location.href='@{/loginForm}'|">로그인</button>
+      <div class="d-flex justify-content-between small">
+        <a th:href="@{/joinForm}">회원가입</a>
+        <a th:href="@{/membersearch}">ID/PW 찾기</a>
+      </div>
+    </div>
+
+    <!-- 로그인 -->
+    <div th:if="${member != null}">
+      <div class="mb-2">
+        <strong th:text="${member.nick_name} + '님 환영합니다!'"></strong>
+        <p class="mb-1 small"><i class="bi bi-bar-chart-fill me-1"></i>레벨: <span th:text="${member.member_level}"></span></p>
+        <p class="mb-1 small"><i class="bi bi-lightning-fill me-1"></i>EXP: <span th:text="${member.member_exp}"></span></p>
+      </div>
+      <button class="btn btn-sm btn-danger w-100 mb-2" th:onclick="|location.href='@{/logout}'|">로그아웃</button>
+      <button class="btn btn-sm btn-secondary w-100" th:onclick="|location.href='@{/modifyForm}'|">회원정보수정</button>
+    </div>
+  </div>
+
+  <!-- 검색 -->
+  <form class="input-group input-group-sm mb-4" th:action="@{/mainSearch}" method="get">
+    <input type="text" name="keyword" class="form-control" placeholder="LoL 아웃벤 통합검색" />
+    <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+  </form>
+
+  <!-- 뉴스 -->
+  <div class="mb-4">
+    <h6 class="border-bottom pb-1 mb-2 text-muted">LoL 뉴스 / 정보</h6>
+    <ul class="list-unstyled small">
+      <li><a th:href="@{/board/reporter_news_BoardList}" class="d-block py-1 fw-bold text-primary"><i class="bi bi-megaphone me-1"></i>리포터뉴스</a></li>
+      <li><a th:href="@{/board/tipBoardList}" class="d-block py-1"><i class="bi bi-lightbulb me-1"></i>팁 & 공략 게시판</a></li>
+      <li><a th:href="@{/board/patchBoardList}" class="d-block py-1 fw-bold"><i class="bi bi-tools me-1"></i>패치 & 정보 게시판</a></li>
+      <li><a th:href="@{/board/positionBoardList}" class="d-block py-1"><i class="bi bi-geo-alt me-1"></i>포지션 게시판</a></li>
+      <li><a th:href="@{/board/recommend_BoardList}" class="d-block py-1 text-danger fw-bold"><i class="bi bi-star-fill me-1"></i>추천 게시판</a></li>
+    </ul>
+  </div>
+
+  <!-- 커뮤니티 -->
+  <div>
+    <h6 class="border-bottom pb-1 mb-2 text-muted">커뮤니티 게시판</h6>
+    <ul class="list-unstyled small">
+      <li><a th:href="@{/board/freeBoardList}" class="d-block py-1 fw-bold"><i class="bi bi-chat-left-text me-1"></i>자유 게시판</a></li>
+      <li><a th:href="@{/board/accidentBoardList}" class="d-block py-1"><i class="bi bi-exclamation-triangle me-1"></i>사건 & 사고 게시판</a></li>
+      <li><a th:href="@{/board/suggest_report_BoardList}" class="d-block py-1"><i class="bi bi-exclamation-triangle me-1"></i>사이트 건의 / 제보</a></li>
+      <li><a th:href="@{/board/imageBoardList}" class="d-block py-1 fw-bold"><i class="bi bi-image me-1"></i>팬아트/카툰 게시판</a></li>
+    </ul>
+  </div>
+</aside>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Insert title here</title>
+<script type="text/javascript">
+	if(<span th:text="result">){
+		alert("댓글 저장이 성공했습니다.");
+	}else{
+		alert("댓글 저장이 실패했습니다.");
+	}
+	location.href="/board/reporter_news_BoardView?board_num=<span th:text="board_num">&pg=<span th:text="pg">";
+</script>
+</head>
+<body>
+</body>
+</html>
+
+<footer th:replace="layouts/footer :: footer"></footer>
+
+

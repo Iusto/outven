@@ -1,0 +1,49 @@
+plugins {
+    id 'java'
+    id 'war' // 반드시 추가!
+    id 'org.springframework.boot' version '3.2.2'
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '17'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    implementation 'com.oracle.database.jdbc:ojdbc8:19.20.0.0'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '3.2.2'
+    
+    // 내장 Tomcat 제거 (외장 Tomcat 사용을 위해 필요)
+    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    
+    // Spring Security 의존성 추가
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.security:spring-security-core'
+    implementation 'org.springframework.security:spring-security-config'
+    implementation 'org.springframework.security:spring-security-web'
+
+    // 비밀번호 암호화 (BCryptPasswordEncoder 등)
+    implementation 'org.springframework.security:spring-security-crypto'
+}
+
+// WAR 파일 생성 설정
+bootJar {
+    enabled = false // JAR 파일 비활성화
+}
+
+war {
+    enabled = true // WAR 파일 활성화
+}

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Outven</title>
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</head>
+<body>
+	<header class="bg-dark text-white p-3">
+		<div
+			class="container d-flex justify-content-between align-items-center">
+			<div class="d-flex align-items-center">
+				<img th:src="@{/image/i8206687393.png}" alt="로고">
+			</div>
+			<div>
+				<span th:if="${session.member != null}">
+					<button class="btn btn-sm btn-outline-light"
+						onclick="location.href='/logout'">로그아웃</button>
+					<button class="btn btn-sm btn-outline-light"
+						onclick="location.href='/modifyForm'">회원정보수정</button>
+				</span> <span th:unless="${session.member != null}">
+					<button class="btn btn-sm btn-outline-light"
+						onclick="location.href='/joinForm'">회원가입</button>
+					<button class="btn btn-sm btn-outline-light"
+						onclick="location.href='/loginForm'">로그인</button>
+				</span>
+			</div>
+
+		</div>
+	</header>
+</body>
+</html>

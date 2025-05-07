@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8" />
+<title>아웃벤 로그인 결과</title>
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body class="bg-light d-flex flex-column min-vh-100">
+
+	<header th:replace="layouts/header :: header"></header>
+	<nav th:replace="layouts/nav :: nav"></nav>
+
+	<main
+		class="container flex-grow-1 d-flex justify-content-center align-items-center"
+		style="min-height: 70vh;">
+		<div class="text-center">
+			<h2 class="mb-4">로그인 결과</h2>
+			<p class="text-muted">처리중...</p>
+		</div>
+	</main>
+
+	<footer th:replace="layouts/footer :: footer"></footer>
+
+	<!-- thymeleaf에서 js 안에 변수를 직접 사용할 때 -->
+	<script th:inline="javascript">
+  /*<![CDATA[*/
+  const result = [[${result}]];
+  const attendance = [[${attendance}]];
+
+  if (result && attendance) {
+    alert("로그인 되었습니다.");
+    location.href = "/index";
+  } else if (result && !attendance) {
+    alert("[출석체크 보너스] 경험치 +10");
+    location.href = "/index";
+  } else {
+    alert("아이디나 비밀번호가 틀립니다.");
+    history.back();
+  }
+  /*]]>*/
+</script>
+
+</body>
+</html>

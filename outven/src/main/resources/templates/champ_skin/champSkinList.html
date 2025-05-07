@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<title>Champskinlist</title>
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<header th:replace="layouts/header :: header"></header>
+<nav th:replace="layouts/nav :: nav"></nav>
+<main class="container my-4 flex-grow-1">
+<span th:text="&gt;layouts/header">
+<style>
+.champimg1{
+float: left;
+padding: 10px;
+
+}
+
+#imid_bc7508c96f3cc48 .common-title::before {
+    background: #074f68; /* 가상 요소에 배경색 지정 */
+}
+
+#imid_bc7508c96f3cc48 .common-title {
+    background: #047e99; /* 요소에 배경색 지정 */
+    color: #ffffff; /* 글자색 지정 */
+
+}
+</style>
+<article>
+<span th:text="&gt;layouts/nav">
+<section class="commu-center">
+<script type="text/javascript">
+		$(function(){
+			$("#cbutton").click(function(){
+				$("#search").val("");
+				$(".champimg1").show();
+			});
+			$("#search").keyup(function(){
+				var k = $(this).val();
+				$(".champimg1").hide();
+				var temp = $(".champimg1 nobr:contains('" + k +"')");
+				//$('.commu-center').html(temp.parent().parent());
+				$(temp).parent().parent().show();
+			});
+		});
+	</script>
+<section class="commu-common" id="imid_bc7508c96f3cc48">
+<h2 class="common-title">
+<span class="main">스킨 갤러리</span> <span class="sub"></span>
+</h2>
+</section>
+<input id="cbutton" type="button" value="초기화"/>
+<input id="search" type="text"/>
+<br/><br/>
+<ul class="champlist">
+<span th:text="#champList">
+<li class="champimg1">
+<a champ_code"="" href="/champ_skin/champSkinView?champ_code=&lt;span th:text=">"&gt;
+			<img alt="" champ_image"="" src="../champion_image/&lt;span th:text="/>" width="64px" height="64px"&gt;</a>
+<div align="center" class="cname" style="font: 11px bold; width: 64px;"><nobr><span th:text="champ_name"></span></nobr></div>
+</li>
+champList"&gt;
+		</span></ul>
+</section>
+</span></article>
+</span></main>
+<footer th:replace="layouts/footer :: footer"></footer>
+</body>
+</html>

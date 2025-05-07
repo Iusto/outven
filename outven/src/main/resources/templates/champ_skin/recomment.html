@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Insert title here</title>
+<script type="text/javascript">
+	if(<span th:text="result">){
+		alert("답글 입력 성공");
+	}else{
+		alert("답글 입력 실패");
+	}
+	location.href="/champ_skin/champSkinView?champ_code=<span th:text="champ_code">&skin_code=<span th:text="skin_code">&pg=<span th:text="pg">";
+</script>
+</head>
+<body>
+</body>
+</html>
+
+<footer th:replace="layouts/footer :: footer"></footer>
+
+

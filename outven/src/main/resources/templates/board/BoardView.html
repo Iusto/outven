@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8" />
+<title th:text="${category} + ' - 상세보기'">게시판 상세보기</title>
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+	rel="stylesheet" />
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+	<header th:replace="~{layouts/header :: header}"></header>
+	<nav th:replace="~{layouts/nav :: nav}"></nav>
+
+	<main class="container my-4 flex-grow-1">
+
+		<!-- 게시글 상단 -->
+		<div class="d-flex justify-content-between align-items-center mb-3">
+			<a class="btn btn-outline-secondary"
+				th:href="@{/board(category=${category}, page=${page}, detail_category=${detail_category})}">←
+				목록으로</a>
+
+			<div th:if="${isMemId}" class="d-flex gap-2">
+				<a class="btn btn-outline-danger"
+					th:href="@{/board/delete(board_num=${board_num}, category=${category})}"
+					onclick="return confirm('정말 삭제하시겠습니까?')">삭제</a> <a
+					class="btn btn-outline-primary"
+					th:href="@{/board/modifyForm(board_num=${board_num}, category=${category})}">수정</a>
+			</div>
+		</div>
+
+		<!-- 게시글 정보 -->
+		<div class="mb-3">
+			<h2 th:text="${board.board_title}">제목</h2>
+			<div class="text-muted">
+				<span th:text="${board.nick_name}"></span> ( <span
+					th:text="${board.member_id}"></span>) · <span
+					th:text="${board.board_logtime}"></span> · 조회수 <span
+					th:text="${board.board_hit}"></span> · 추천수 <span
+					th:text="${board.board_recommend}"></span>
+			</div>
+		</div>
+
+		<!-- 이미지 -->
+		<div class="mb-4">
+			<img class="img-fluid" th:if="${board.board_img != null}"
+				th:src="@{'/storage/' + ${board.board_img}}" alt="게시글 이미지" />
+			<p th:if="${board.board_img == null}" class="text-muted fst-italic">이미지가
+				없습니다.</p>
+		</div>
+
+		<!-- 본문 -->
+		<div class="mb-5">
+			<p th:utext="${board.board_content}"></p>
+		</div>
+
+		<!-- 추천 / 신고 -->
+		<div class="d-flex justify-content-end gap-3 mb-5">
+			<button class="btn btn-outline-success" id="btnRecom">추천</button>
+			<button class="btn btn-outline-warning" id="btnReport">신고</button>
+		</div>
+
+		<!-- 댓글 목록 -->
+		<div>
+			<h4>댓글</h4>
+			<div th:if="${listExist}">
+				<div class="list-group mb-4">
+					<div class="list-group-item" th:each="comment : ${commentList}"
+						th:classappend="${comment.recommend >= 5} ? 'border border-success shadow-sm'">
+						<div class="d-flex justify-content-between align-items-center">
+							<div>
+								<strong th:text="${comment.nick_name}">닉네임</strong> <span
+									class="badge text-bg-success ms-2"
+									th:if="${comment.recommend >= 5}"> <i
+									class="bi bi-star-fill"></i> 인기 댓글
+								</span>
+							</div>
+							<span class="text-muted" th:text="${comment.comment_logtime}">시간</span>
+						</div>
+						<p th:text="${comment.comment_content}" class="mb-1"></p>
+						<div class="d-flex gap-2">
+							<button class="btn btn-sm btn-outline-danger delCom"
+								th:data-num="${comment.comment_num}">삭제</button>
+							<button class="btn btn-sm btn-outline-secondary replyBtn"
+								th:data-num="${comment.comment_num}">답글</button>
+							<button class="btn btn-sm btn-outline-success recommendBtn"
+								th:data-num="${comment.comment_num}">추천</button>
+							<span>추천수: <span th:text="${comment.recommend}">0</span></span>
+						</div>
+
+						<!-- 대댓글 입력 -->
+						<form method="post" th:action="@{/board/commentWrite}"
+							class="replyForm d-none mt-2"
+							th:id="'replyForm_' + ${comment.comment_num}">
+							<input type="hidden" name="board_num"
+								th:value="${board.board_num}" /> <input type="hidden"
+								name="parent_comment_num" th:value="${comment.comment_num}" />
+							<input type="hidden" name="category" th:value="${category}" />
+							<textarea name="comment_content" class="form-control mb-2"
+								rows="2" placeholder="답글을 입력하세요"></textarea>
+							<button class="btn btn-sm btn-dark">등록</button>
+						</form>
+					</div>
+				</div>
+
+				<!-- 댓글 페이징 -->
+				<div class="text-center my-4">
+					<span th:if="${!commentPageInfo.first}"> <a
+						class="btn btn-sm btn-outline-primary"
+						th:href="@{/board/view(board_num=${board.board_num}, page=${page}, category=${category}, comPg=${commentPageInfo.prevPage})}">이전</a>
+					</span> <span th:each="i : ${commentPageInfo.pageNumbers}"> <a
+						th:href="@{/board/view(board_num=${board.board_num}, page=${page}, category=${category}, comPg=${i})}"
+						th:classappend="${i == commentPageInfo.currentPage} ? 'btn btn-sm btn-primary mx-1' : 'btn btn-sm btn-outline-secondary mx-1'"
+						th:text="${i}">1</a>
+					</span> <span th:if="${!commentPageInfo.last}"> <a
+						class="btn btn-sm btn-outline-primary"
+						th:href="@{/board/view(board_num=${board.board_num}, page=${page}, category=${category}, comPg=${commentPageInfo.nextPage})}">다음</a>
+					</span>
+				</div>
+			</div>
+			<div th:if="${!listExist}" class="text-center text-muted">작성된
+				댓글이 없습니다.</div>
+		</div>
+
+		<!-- 댓글 작성 -->
+		<form method="post" th:action="@{/board/commentWrite}" class="mt-4">
+			<input type="hidden" name="board_num" th:value="${board.board_num}" />
+			<input type="hidden" name="category" th:value="${category}" />
+			<div class="mb-3">
+				<textarea name="comment_content" class="form-control" rows="3"
+					placeholder="댓글을 입력하세요"></textarea>
+			</div>
+			<button id="write" class="btn btn-primary">댓글 등록</button>
+		</form>
+
+		<input type="hidden" id="hiddenData" th:data-id="${member?.memberId}"
+			th:data-bnum="${board.board_num}" />
+
+	</main>
+
+	<footer th:replace="~{layouts/footer :: footer}"></footer>
+
+	<script th:inline="javascript">
+  $(function () {
+    const board_num = $('#hiddenData').data('bnum');
+    const member_id = $('#hiddenData').data('id');
+    const category = [[${category}]];
+    const page = [[${page}]];
+
+    $('#btnRecom').click(function () {
+      if (!member_id) {
+        alert('로그인이 필요합니다.');
+        return;
+      }
+      $.post('/checkRecommend', { board_num, member_id }, function (data) {
+        if (data === true) {
+          alert('추천은 한 번만 가능합니다.');
+        } else {
+          location.href = `/board/recommend?board_num=${board_num}&member_id=${member_id}&page=${page}&category=${category}`;
+        }
+      });
+    });
+
+    $('#btnReport').click(function () {
+      if (!member_id) {
+        alert('로그인이 필요합니다.');
+        return;
+      }
+      $.post('/checkReport', { board_num, member_id }, function (data) {
+        if (data === true) {
+          alert('신고는 한 번만 가능합니다.');
+        } else {
+          window.open(`/reportForm?member_id=${member_id}&board_num=${board_num}&page=${page}&category=${category}`, '', 'width=500,height=300');
+        }
+      });
+    });
+
+    $('.replyBtn').click(function () {
+      const num = $(this).data('num');
+      $('#replyForm_' + num).toggleClass('d-none');
+    });
+
+    $('.recommendBtn').click(function () {
+      const comment_num = $(this).data('num');
+      if (!member_id) {
+        alert('로그인이 필요합니다.');
+        return;
+      }
+      $.post('/checkCommentRecommend', { comment_num, member_id }, function (data) {
+        if (data === true) {
+          alert('이미 추천한 댓글입니다.');
+        } else {
+          location.href = `/board/commentRecommend?comment_num=${comment_num}&member_id=${member_id}&board_num=${board_num}&category=${category}&page=${page}`;
+        }
+      });
+    });
+
+    $('.delCom').click(function () {
+      const comment_num = $(this).data('num');
+      if (confirm('댓글을 삭제하시겠습니까?')) {
+        location.href = `/commentDelete?comment_num=${comment_num}&board_num=${board_num}&category=${category}&page=${page}`;
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>관리자 계정 관리</title>
+  <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body class="bg-light d-flex flex-column min-vh-100">
+<header th:replace="layouts/header :: header"></header>
+<nav th:replace="layouts/nav :: nav"></nav>
+
+<main class="container my-5 flex-grow-1">
+  <div th:if="${member?.userRole != 'admin'}" class="alert alert-danger text-center">
+    관리자 권한이 필요합니다.
+  </div>
+
+  <div th:if="${member?.userRole == 'admin'}">
+    <h2 class="mb-4">👑 관리자 계정 관리</h2>
+
+    <!-- 탭 메뉴 -->
+    <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
+      <li class="nav-item">
+        <button class="nav-link active" id="accounts-tab" data-bs-toggle="tab" data-bs-target="#accounts"
+                type="button" role="tab">전체 계정 관리</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" id="role-tab" data-bs-toggle="tab" data-bs-target="#role"
+                type="button" role="tab">관리자 임명/해제</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" id="blacklist-tab" data-bs-toggle="tab" data-bs-target="#blacklist"
+                type="button" role="tab">블랙리스트 관리</button>
+      </li>
+    </ul>
+
+    <div class="tab-content">
+      <!-- ✅ 전체 계정 탭 -->
+      <div class="tab-pane fade show active" id="accounts" role="tabpanel">
+        <table class="table table-bordered text-center">
+          <thead class="table-light">
+            <tr>
+              <th>선택</th>
+              <th>아이디</th>
+              <th>닉네임</th>
+              <th>레벨</th>
+              <th>경험치</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="m : ${memberList}">
+              <td><input type="checkbox" class="update-check" th:data-id="${m.memberId}"/></td>
+              <td th:text="${m.memberId}">user123</td>
+              <td th:text="${m.nickName}">닉네임</td>
+              <td>
+                <input type="number" class="form-control level-input"
+                       th:value="${m.memberLevel}" th:data-original="${m.memberLevel}"
+                       th:data-id="${m.memberId}" />
+              </td>
+              <td>
+                <input type="number" class="form-control exp-input"
+                       th:value="${m.memberExp}" th:data-original="${m.memberExp}"
+                       th:data-id="${m.memberId}" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <button id="saveMemberChangesBtn" class="btn btn-primary">변경사항 저장</button>
+      </div>
+
+      <!-- 👉 향후 다른 탭도 여기에 -->
+      <div class="tab-pane fade" id="role" role="tabpanel">관리자 임명/해제 기능 예정</div>
+      <div class="tab-pane fade" id="blacklist" role="tabpanel">블랙리스트 등록/해제 기능 예정</div>
+    </div>
+  </div>
+</main>
+
+<script>
+  $(function () {
+    $(".level-input, .exp-input").on("input", function () {
+      const $input = $(this);
+      const memberId = $input.data("id");
+
+      const $level = $(`.level-input[data-id='${memberId}']`);
+      const $exp = $(`.exp-input[data-id='${memberId}']`);
+
+      const isChanged = $level.val() !== $level.data("original").toString() ||
+                        $exp.val() !== $exp.data("original").toString();
+
+      $(`.update-check[data-id='${memberId}']`).prop("checked", isChanged);
+    });
+
+    $("#saveMemberChangesBtn").click(function () {
+      const updates = [];
+
+      $(".update-check:checked").each(function () {
+        const id = $(this).data("id");
+        const level = $(`.level-input[data-id='${id}']`).val();
+        const exp = $(`.exp-input[data-id='${id}']`).val();
+        updates.push({ memberId: id, level: level, exp: exp });
+      });
+
+      if (updates.length === 0) {
+        alert("변경된 항목이 없습니다.");
+        return;
+      }
+
+      $.ajax({
+        url: "/admin/updateMembers",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(updates),
+        success: function () {
+          alert("저장되었습니다!");
+          location.reload();
+        },
+        error: function () {
+          alert("저장 중 오류 발생");
+        }
+      });
+    });
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:replace="${title} :: title">Outven</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+  <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+  <script th:src="@{/js/common.js}"></script> <!-- 필요 시 공통 JS 파일 -->
+</head>
+<body class="bg-light d-flex flex-column min-vh-100">
+
+  <!-- ✅ Header -->
+  <header th:replace="layouts/header :: header"></header>
+
+  <!-- ✅ Navigation -->
+  <nav th:replace="layouts/nav :: nav"></nav>
+
+  <!-- ✅ Main Content Area -->
+  <main class="container my-4 flex-grow-1" th:fragment="content">
+    <div class="text-center">내용이 없습니다.</div>
+  </main>
+
+  <!-- ✅ Footer -->
+  <footer th:replace="layouts/footer :: footer"></footer>
+
+</body>
+</html>

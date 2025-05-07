@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8" />
+<title th:text="(${category} + ' 글쓰기')">글쓰기</title>
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+	rel="stylesheet" />
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+	<header th:replace="~{layouts/header :: header}"></header>
+	<nav th:replace="~{layouts/nav :: nav}"></nav>
+
+	<main class="container my-4 flex-grow-1">
+		<h2 th:text="(${category} + ' 글쓰기')"></h2>
+
+		<form th:action="@{/board/write}" method="post"
+			enctype="multipart/form-data">
+			<input type="hidden" name="member_id" th:value="${member?.memberId}" />
+			<input type="hidden" name="nick_name" th:value="${member?.nickName}" />
+			<input type="hidden" name="board_category" th:value="${category}" />
+
+			<!-- detail_category -->
+			<div class="mb-3">
+				<label for="detail_category" class="form-label">카테고리</label> <select
+					name="detail_category" class="form-select" id="detail_category">
+					<option value="">선택</option>
+					<option th:each="opt : ${categoryOptions}" th:value="${opt}"
+						th:text="${opt}"></option>
+				</select>
+			</div>
+
+			<!-- 제목 -->
+			<div class="mb-3">
+				<label for="board_title" class="form-label">제목</label> <input
+					type="text" name="board_title" class="form-control"
+					id="board_title" maxlength="150" required />
+			</div>
+
+			<!-- 내용 -->
+			<div class="mb-3">
+				<label for="board_content" class="form-label">내용</label>
+				<textarea name="board_content" class="form-control"
+					id="board_content" rows="10" required></textarea>
+			</div>
+
+			<!-- 이미지 -->
+			<div class="mb-3">
+				<label for="board_img" class="form-label">이미지 업로드 (선택)</label> <input
+					type="file" name="board_img" class="form-control" id="board_img" />
+			</div>
+
+			<div class="text-end">
+				<button type="submit" class="btn btn-dark">등록</button>
+			</div>
+		</form>
+	</main>
+
+	<footer th:replace="~{layouts/footer :: footer}"></footer>
+
+</body>
+</html>

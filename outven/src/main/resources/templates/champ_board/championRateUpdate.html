@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Insert title here</title>
+<script type="text/javascript">
+	if(<span th:text="result">){
+		alert("저장성공");
+	}else{
+		alert("저장실패");
+	}
+	location.href="/champ_board/championView?champ_code=<span th:text="champ_code">";
+</script>
+</head>
+<body>
+</body>
+</html>
+
+<footer th:replace="layouts/footer :: footer"></footer>
+
+
