@@ -16,7 +16,8 @@ public class Board_comment {
     private String comment_content;
     private String member_id;
     private String nick_name;
-    private LocalDateTime comment_logtime;
+    @Column(name = "comment_logtime")
+    private LocalDateTime commentLogtime;
     private int recommend;
 
     // 🔹 대댓글 기능을 위한 부모 댓글 번호 (null이면 일반 댓글)

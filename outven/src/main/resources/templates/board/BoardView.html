@@ -25,36 +25,36 @@
 
 			<div th:if="${isMemId}" class="d-flex gap-2">
 				<a class="btn btn-outline-danger"
-					th:href="@{/board/delete(board_num=${board_num}, category=${category})}"
+					th:href="@{/board/delete(boardNum=${boardNum}, category=${category})}"
 					onclick="return confirm('정말 삭제하시겠습니까?')">삭제</a> <a
 					class="btn btn-outline-primary"
-					th:href="@{/board/modifyForm(board_num=${board_num}, category=${category})}">수정</a>
+					th:href="@{/board/modifyForm(boardNum=${boardNum}, category=${category})}">수정</a>
 			</div>
 		</div>
 
 		<!-- 게시글 정보 -->
 		<div class="mb-3">
-			<h2 th:text="${board.board_title}">제목</h2>
+			<h2 th:text="${board.boardTitle}">제목</h2>
 			<div class="text-muted">
-				<span th:text="${board.nick_name}"></span> ( <span
-					th:text="${board.member_id}"></span>) · <span
-					th:text="${board.board_logtime}"></span> · 조회수 <span
-					th:text="${board.board_hit}"></span> · 추천수 <span
-					th:text="${board.board_recommend}"></span>
+				<span th:text="${board.nickName}"></span> ( <span
+					th:text="${board.memberId}"></span>) · <span
+					th:text="${#temporals.format(board.createdAt, 'yyyy-MM-dd HH:mm')}"></span> · 조회수 <span
+					th:text="${board.boardHit}"></span> · 추천수 <span
+					th:text="${board.boardRecommend}"></span>
 			</div>
 		</div>
 
 		<!-- 이미지 -->
 		<div class="mb-4">
-			<img class="img-fluid" th:if="${board.board_img != null}"
-				th:src="@{'/storage/' + ${board.board_img}}" alt="게시글 이미지" />
-			<p th:if="${board.board_img == null}" class="text-muted fst-italic">이미지가
+			<img class="img-fluid" th:if="${board.boardImg != null}"
+				th:src="@{'/storage/' + ${board.boardImg}}" alt="게시글 이미지" />
+			<p th:if="${board.boardImg == null}" class="text-muted fst-italic">이미지가
 				없습니다.</p>
 		</div>
 
 		<!-- 본문 -->
 		<div class="mb-5">
-			<p th:utext="${board.board_content}"></p>
+			<p th:utext="${board.boardContent}"></p>
 		</div>
 
 		<!-- 추천 / 신고 -->
@@ -95,8 +95,8 @@
 						<form method="post" th:action="@{/board/commentWrite}"
 							class="replyForm d-none mt-2"
 							th:id="'replyForm_' + ${comment.comment_num}">
-							<input type="hidden" name="board_num"
-								th:value="${board.board_num}" /> <input type="hidden"
+							<input type="hidden" name="boardNum"
+								th:value="${board.boardNum}" /> <input type="hidden"
 								name="parent_comment_num" th:value="${comment.comment_num}" />
 							<input type="hidden" name="category" th:value="${category}" />
 							<textarea name="comment_content" class="form-control mb-2"
@@ -110,14 +110,14 @@
 				<div class="text-center my-4">
 					<span th:if="${!commentPageInfo.first}"> <a
 						class="btn btn-sm btn-outline-primary"
-						th:href="@{/board/view(board_num=${board.board_num}, page=${page}, category=${category}, comPg=${commentPageInfo.prevPage})}">이전</a>
+						th:href="@{/board/view(boardNum=${board.boardNum}, page=${page}, category=${category}, comPg=${commentPageInfo.prevPage})}">이전</a>
 					</span> <span th:each="i : ${commentPageInfo.pageNumbers}"> <a
-						th:href="@{/board/view(board_num=${board.board_num}, page=${page}, category=${category}, comPg=${i})}"
+						th:href="@{/board/view(boardNum=${board.boardNum}, page=${page}, category=${category}, comPg=${i})}"
 						th:classappend="${i == commentPageInfo.currentPage} ? 'btn btn-sm btn-primary mx-1' : 'btn btn-sm btn-outline-secondary mx-1'"
 						th:text="${i}">1</a>
 					</span> <span th:if="${!commentPageInfo.last}"> <a
 						class="btn btn-sm btn-outline-primary"
-						th:href="@{/board/view(board_num=${board.board_num}, page=${page}, category=${category}, comPg=${commentPageInfo.nextPage})}">다음</a>
+						th:href="@{/board/view(boardNum=${board.boardNum}, page=${page}, category=${category}, comPg=${commentPageInfo.nextPage})}">다음</a>
 					</span>
 				</div>
 			</div>
@@ -127,7 +127,7 @@
 
 		<!-- 댓글 작성 -->
 		<form method="post" th:action="@{/board/commentWrite}" class="mt-4">
-			<input type="hidden" name="board_num" th:value="${board.board_num}" />
+			<input type="hidden" name="boardNum" th:value="${board.boardNum}" />
 			<input type="hidden" name="category" th:value="${category}" />
 			<div class="mb-3">
 				<textarea name="comment_content" class="form-control" rows="3"
@@ -137,7 +137,7 @@
 		</form>
 
 		<input type="hidden" id="hiddenData" th:data-id="${member?.memberId}"
-			th:data-bnum="${board.board_num}" />
+			th:data-bnum="${board.boardNum}" />
 
 	</main>
 
@@ -145,7 +145,7 @@
 
 	<script th:inline="javascript">
   $(function () {
-    const board_num = $('#hiddenData').data('bnum');
+    const boardNum = $('#hiddenData').data('bnum');
     const member_id = $('#hiddenData').data('id');
     const category = [[${category}]];
     const page = [[${page}]];
@@ -155,11 +155,11 @@
         alert('로그인이 필요합니다.');
         return;
       }
-      $.post('/checkRecommend', { board_num, member_id }, function (data) {
+      $.post('/checkRecommend', { boardNum, member_id }, function (data) {
         if (data === true) {
           alert('추천은 한 번만 가능합니다.');
         } else {
-          location.href = `/board/recommend?board_num=${board_num}&member_id=${member_id}&page=${page}&category=${category}`;
+          location.href = `/board/recommend?boardNum=${boardNum}&member_id=${member_id}&page=${page}&category=${category}`;
         }
       });
     });
@@ -169,11 +169,11 @@
         alert('로그인이 필요합니다.');
         return;
       }
-      $.post('/checkReport', { board_num, member_id }, function (data) {
+      $.post('/checkReport', { boardNum, member_id }, function (data) {
         if (data === true) {
           alert('신고는 한 번만 가능합니다.');
         } else {
-          window.open(`/reportForm?member_id=${member_id}&board_num=${board_num}&page=${page}&category=${category}`, '', 'width=500,height=300');
+          window.open(`/reportForm?member_id=${member_id}&boardNum=${boardNum}&page=${page}&category=${category}`, '', 'width=500,height=300');
         }
       });
     });
@@ -193,7 +193,7 @@
         if (data === true) {
           alert('이미 추천한 댓글입니다.');
         } else {
-          location.href = `/board/commentRecommend?comment_num=${comment_num}&member_id=${member_id}&board_num=${board_num}&category=${category}&page=${page}`;
+          location.href = `/board/commentRecommend?comment_num=${comment_num}&member_id=${member_id}&boardNum=${boardNum}&category=${category}&page=${page}`;
         }
       });
     });
@@ -201,7 +201,7 @@
     $('.delCom').click(function () {
       const comment_num = $(this).data('num');
       if (confirm('댓글을 삭제하시겠습니까?')) {
-        location.href = `/commentDelete?comment_num=${comment_num}&board_num=${board_num}&category=${category}&page=${page}`;
+        location.href = `/commentDelete?comment_num=${comment_num}&boardNum=${boardNum}&category=${category}&page=${page}`;
       }
     });
   });

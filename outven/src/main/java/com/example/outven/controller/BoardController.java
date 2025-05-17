@@ -9,8 +9,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -147,7 +149,7 @@ public class BoardController {
             isMemId = board.getMemberId().equals(member.getMemberId());
         }
 
-        Pageable commentPageable = PageRequest.of(comPg - 1, 10, Sort.by(Sort.Direction.DESC, "comment_logtime"));
+        Pageable commentPageable = PageRequest.of(comPg - 1, 10, Sort.by(Sort.Direction.DESC, "commentLogtime"));
         Page<Board_comment> commentPage = boardService.getCommentList(board_num, commentPageable);
 
         List<Integer> commentPageList = new ArrayList<>();
@@ -274,4 +276,17 @@ public class BoardController {
         model.addAttribute("action", "modify");
         return "board/BoardResult";
     }
+    
+    @GetMapping("/popular")
+    public ResponseEntity<List<Board>> getPopularBoards() {
+        StopWatch sw = new StopWatch();
+        sw.start();
+
+        List<Board> boards = boardService.getPopularBoards();
+
+        sw.stop();
+        System.out.println("⏱ 응답 시간: " + sw.getTotalTimeMillis() + "ms");
+        return ResponseEntity.ok(boards);
+    }
+
 }

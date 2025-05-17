@@ -1,11 +1,13 @@
 package com.example.outven.service;
 
+import java.time.Duration;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import com.example.outven.dto.BoardDTO;
 import com.example.outven.entity.Board;
@@ -29,6 +31,11 @@ public class BoardService {
     
     @Autowired
     private CommentRecommendRepository commentRecommendRepository;
+    
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+    
+    private final String CACHE_KEY = "popular-boards";
     
     // ✅ BoardDTO → Board 변환 메서드
     private Board convertToEntity(BoardDTO dto) {
@@ -221,5 +228,20 @@ public class BoardService {
 
         return true;
     }
+    
+    public List<Board> getPopularBoards() {
+        List<Board> cached = (List<Board>) redisTemplate.opsForValue().get(CACHE_KEY);
+        if (cached != null) {
+            System.out.println("✅ Redis 캐시에서 인기 게시글 불러옴");
+            return cached;
+        }
+
+        List<Board> boards = boardRepository.findTop10ByOrderByBoardHitDesc();
+        
+        redisTemplate.opsForValue().set(CACHE_KEY, boards, Duration.ofSeconds(30));
+        System.out.println("✅ DB에서 조회 후 Redis에 캐싱");
+        return boards;
+    }
+
 
 }

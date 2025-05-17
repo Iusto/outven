@@ -64,8 +64,8 @@
           </h3>
           <ul class="list-group">
             <li class="list-group-item" th:each="post : ${recommend_board}">
-              <a th:href="@{/board/recommend_BoardView(board_num=${post.board_num}, pg=1, detail_category=${post.detail_category})}"
-                 th:text="${post.board_title}">제목</a>
+              <a th:href="@{/board/view(boardNum=${post.boardNum}, page=${pageInfo.currentPage}, category=${post.boardCategory})}"
+                 th:text="${post.boardTitle}">제목</a>
             </li>
           </ul>
         </div>
@@ -99,8 +99,8 @@
             </h4>
             <ul class="list-group mb-4">
               <li class="list-group-item" th:each="post : ${patch_board}">
-                <a th:href="@{/board/patchBoardView(board_num=${post.board_num}, pg=1, detail_category=${post.detail_category})}"
-                   th:text="${post.board_title}"></a>
+                <a th:href="@{/board/patchBoardView(board_num=${post.boardNum}, pg=1, detail_category=${post.detailCategory})}"
+                   th:text="${post.boardTitle}"></a>
               </li>
             </ul>
           </div>
@@ -113,8 +113,8 @@
             </h4>
             <ul class="list-group mb-4">
               <li class="list-group-item" th:each="post : ${tip_board}">
-                <a th:href="@{/board/tipBoardView(board_num=${post.board_num}, pg=1, detail_category=${post.detail_category})}"
-                   th:text="${post.board_title}"></a>
+                <a th:href="@{/board/tipBoardView(board_num=${post.boardNum}, pg=1, detail_category=${post.detailCategory})}"
+                   th:text="${post.boardTitle}"></a>
               </li>
             </ul>
           </div>
@@ -127,8 +127,8 @@
             </h4>
             <ul class="list-group mb-4">
               <li class="list-group-item" th:each="post : ${position_board}">
-                <a th:href="@{/board/positionBoardView(board_num=${post.board_num}, pg=1, detail_category=${post.detail_category})}"
-                   th:text="${post.board_title}"></a>
+                <a th:href="@{/board/positionBoardView(board_num=${post.boardNum}, pg=1, detail_category=${post.detailCategory})}"
+                   th:text="${post.boardTitle}"></a>
               </li>
             </ul>
           </div>
@@ -141,8 +141,8 @@
             </h4>
             <ul class="list-group mb-4">
               <li class="list-group-item" th:each="post : ${acc_board}">
-                <a th:href="@{/board/accidentBoardView(board_num=${post.board_num}, pg=1, detail_category=${post.detail_category})}"
-                   th:text="${post.board_title}"></a>
+                <a th:href="@{/board/accidentBoardView(board_num=${post.boardNum}, pg=1, detail_category=${post.detailCategory})}"
+                   th:text="${post.boardTitle}"></a>
               </li>
             </ul>
           </div>

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface BoardRepository extends JpaRepository<Board, Integer> {
@@ -60,4 +61,8 @@ public interface BoardRepository extends JpaRepository<Board, Integer> {
 
     // ✅ 제목 기반 통합 검색 (카테고리 무관)
     Page<Board> findByBoardTitleContaining(String keyword, Pageable pageable);
+    
+    // Redis 캐시용 쿼리
+    List<Board> findTop10ByOrderByBoardHitDesc();
+
 }
